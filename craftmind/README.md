@@ -19,6 +19,7 @@ Modular ComputerCraft AI framework for chat, docs-aware help, file creation, and
 - `ui/render.lua` — colored terminal rendering for replies and thinking blocks
 - `providers/` — provider abstraction
 - `ai/lua_agent.lua` — raw Lua preview/confirm executor
+- `ai/tool_runner.lua` — confirmed file write/append tool blocks
 - `turtle/server.lua` — Rednet turtle server skeleton
 - `client/remote.lua` — discovery/run client library
 - `docs/index.lua` — curated local docs search

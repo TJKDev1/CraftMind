@@ -20,6 +20,7 @@ local files = {
   "providers/nvidia.lua",
   "ai/chat.lua",
   "ai/lua_agent.lua",
+  "ai/tool_runner.lua",
   "docs/index.lua",
   "tools/file.lua",
   "ui/menu.lua",
