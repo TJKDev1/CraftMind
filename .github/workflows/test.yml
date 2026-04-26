@@ -23,4 +23,4 @@ jobs:
           flatpak install --user -y flathub cc.craftos_pc.CraftOS-PC
 
       - name: Run test suite
-        run: ./scripts/test.sh
+        run: bash ./scripts/test.sh
