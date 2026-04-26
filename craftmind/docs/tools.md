@@ -62,3 +62,5 @@ print("hi")
 ```
 
 Turtle tools use Rednet protocol `craftmind.v1` and the configured `craftmind.auth_token`; discovery works without a token, all other actions require a matching token on client and server. Remote raw Lua requires `safety=power` locally and on the server, then server-side preview/confirmation. Agents should use `discover -> status -> inspect -> act`, and ask before movement, digging, placing, dropping, or destructive remote Lua.
+
+Human setup UX: Turtle Channel main menu stays simple with auth token, discover/control, and status/next steps. Advanced server/manual setup contains start server, server name, manual server/client commands, and advanced onboarding. If setup is missing, guide users to Turtle Channel first instead of dumping manual commands.

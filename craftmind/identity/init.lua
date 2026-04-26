@@ -122,6 +122,10 @@ Default safety model:
 - Identity files live under `.craftmind/agents/<id>/`.
 - Session logs live under `.craftmind/sessions/` as JSONL.
 - Bundled package docs are mirrored to `.craftmind/docs/bundled/` so workspace-scoped tools can read them on demand.
+
+## Turtle Channel
+
+Agents can control remote turtles with `<craftmind-turtle ...>` tool blocks after discovery. Human setup stays straightforward: Turtle Channel main menu is for auth token, discover/control, and status; Advanced server/manual setup contains starting the server, server name, manual server/client commands, and advanced onboarding. Guide users to the simple path first.
 ]])
   writeIfMissing(fs.combine(dir, "self-modification.md"), [[# Self modification
 
@@ -166,6 +170,9 @@ Use `fs.exists`, `fs.open`, `fs.makeDir`, `fs.delete`, `fs.list`, and `fs.getDir
   end
   if not readIfExists(fs.combine(dir, "craftmind.md")):find("bundled/", 1, true) then
     replaceAllIfExists(fs.combine(dir, "craftmind.md"), "- Session logs live under `.craftmind/sessions/` as JSONL.", "- Session logs live under `.craftmind/sessions/` as JSONL.\n- Bundled package docs are mirrored to `.craftmind/docs/bundled/` so workspace-scoped tools can read them on demand.")
+  end
+  if not readIfExists(fs.combine(dir, "craftmind.md")):find("## Turtle Channel", 1, true) then
+    fileTool.append(fs.combine(dir, "craftmind.md"), "\n## Turtle Channel\n\nAgents can control remote turtles with `<craftmind-turtle ...>` tool blocks after discovery. Human setup stays straightforward: Turtle Channel main menu is for auth token, discover/control, and status; Advanced server/manual setup contains starting the server, server name, manual server/client commands, and advanced onboarding. Guide users to the simple path first.\n")
   end
   return dir
 end
@@ -219,8 +226,13 @@ I can ask CraftMind to use inspectable XML tool blocks:
 - `<craftmind-exec command="ls" />` runs shell commands only in power mode.
 - `<craftmind-lua>...</craftmind-lua>` runs Lua only in power mode.
 - `<craftmind-message to="agent-id">message</craftmind-message>` sends a message to another CraftMind agent.
+- `<craftmind-turtle action="discover" />` discovers CraftMind turtle servers.
+- `<craftmind-turtle action="status|inventory|inspect|select|refuel" id="12" />` controls a remote turtle using configured auth token.
+- `<craftmind-turtle action="run_lua" id="12">...</craftmind-turtle>` runs remote Lua only when `safety=power` locally and on the server.
 
-File/list/read paths are workspace-scoped. Shell and Lua are more powerful and must stay small, auditable, and ComputerCraft-focused.
+Turtle Channel human setup: main menu handles auth token, discover/control, and status. Advanced server/manual setup contains start server, server name, manual commands, and advanced onboarding.
+
+File/list/read paths are workspace-scoped. Shell, Lua, and turtle actions must stay small, auditable, and ComputerCraft-focused.
 ]])
   writeIfMissing(fs.combine(dir, "memory.md"), "# Memory\n\n- Hatched as `" .. id .. "` on " .. now() .. ".\n")
   writeIfMissing(fs.combine(dir, "inbox.md"), "# Inbox\n\n")
@@ -236,6 +248,12 @@ Conventions:
 
   replaceAllIfExists(fs.combine(dir, "tools.md"), "power/admin mode", "power mode")
   replaceAllIfExists(fs.combine(dir, "tools.md"), "`safety=power` or `profile=admin`", "`safety=power`")
+  if not readIfExists(fs.combine(dir, "tools.md")):find("craftmind%-turtle", 1, false) then
+    replaceAllIfExists(fs.combine(dir, "tools.md"), "- `<craftmind-message to=\"agent-id\">message</craftmind-message>` sends a message to another CraftMind agent.", "- `<craftmind-message to=\"agent-id\">message</craftmind-message>` sends a message to another CraftMind agent.\n- `<craftmind-turtle action=\"discover\" />` discovers CraftMind turtle servers.\n- `<craftmind-turtle action=\"status|inventory|inspect|select|refuel\" id=\"12\" />` controls a remote turtle using configured auth token.\n- `<craftmind-turtle action=\"run_lua\" id=\"12\">...</craftmind-turtle>` runs remote Lua only when `safety=power` locally and on the server.")
+  end
+  if not readIfExists(fs.combine(dir, "tools.md")):find("Turtle Channel human setup", 1, true) then
+    replaceAllIfExists(fs.combine(dir, "tools.md"), "File/list/read paths are workspace-scoped. Shell and Lua are more powerful and must stay small, auditable, and ComputerCraft-focused.", "Turtle Channel human setup: main menu handles auth token, discover/control, and status. Advanced server/manual setup contains start server, server name, manual commands, and advanced onboarding.\n\nFile/list/read paths are workspace-scoped. Shell, Lua, and turtle actions must stay small, auditable, and ComputerCraft-focused.")
+  end
   replaceAllIfExists(fs.combine(dir, "orchestration.md"), "power/admin mode", "power mode")
 
   return id, dir

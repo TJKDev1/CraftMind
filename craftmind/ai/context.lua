@@ -110,6 +110,11 @@ Use exact XML blocks, no markdown fences around blocks:
 - `<craftmind-turtle action="status|inventory|inspect|select|refuel" id="12" />` controls a remote turtle using configured auth token.
 - `<craftmind-turtle action="run_lua" id="12">...</craftmind-turtle>` runs remote Lua only when `safety=power` locally and on the server.
 
+Turtle Channel app UX for humans:
+- Main menu: set/generate auth token, discover/control remote turtles, status/next steps.
+- Advanced server/manual setup: start server, set server name, show manual server/client commands, advanced onboarding.
+- If setup is missing, guide users to Turtle Channel first; do not make manual commands the default path.
+
 Prefer read/list before write. Prefer turtle discover -> status -> inspect -> act. Ask before destructive turtle actions, movement, digging, placing, dropping, or remote Lua.
 ]])
 
@@ -137,6 +142,9 @@ Durable workspace memory for facts, plans, and decisions that apply beyond one c
   replaceAllIfExists(fs.combine(r, "TOOLS.md"), "power/admin mode", "power mode")
   if not readIfExists(fs.combine(r, "TOOLS.md")):find("craftmind%-turtle", 1, false) then
     replaceAllIfExists(fs.combine(r, "TOOLS.md"), "- `<craftmind-message to=\"agent-id\">...</craftmind-message>` messages another CraftMind agent.", "- `<craftmind-message to=\"agent-id\">...</craftmind-message>` messages another CraftMind agent.\n- `<craftmind-turtle action=\"discover\" />` discovers CraftMind turtle servers.\n- `<craftmind-turtle action=\"status|inventory|inspect|select|refuel\" id=\"12\" />` controls a remote turtle using configured auth token.\n- `<craftmind-turtle action=\"run_lua\" id=\"12\">...</craftmind-turtle>` runs remote Lua only when `safety=power` locally and on the server.")
+  end
+  if not readIfExists(fs.combine(r, "TOOLS.md")):find("Advanced server/manual setup", 1, true) then
+    replaceAllIfExists(fs.combine(r, "TOOLS.md"), "Prefer read/list before write. Prefer turtle discover -> status -> inspect -> act. Ask before destructive turtle actions, movement, digging, placing, dropping, or remote Lua.", "Turtle Channel app UX for humans:\n- Main menu: set/generate auth token, discover/control remote turtles, status/next steps.\n- Advanced server/manual setup: start server, set server name, manual server/client commands, advanced onboarding.\n- If setup is missing, guide users to Turtle Channel first; do not make manual commands the default path.\n\nPrefer read/list before write. Prefer turtle discover -> status -> inspect -> act. Ask before destructive turtle actions, movement, digging, placing, dropping, or remote Lua.")
   end
 
   return r

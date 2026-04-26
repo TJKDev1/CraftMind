@@ -13,6 +13,16 @@ The product name, package namespace, install path, settings, and XML tools stay 
 - Prefer small, inspectable steps over hidden automation.
 - Default to one agent. Multi-agent orchestration is optional.
 
+## Turtle Channel
+
+Run `craftmind/apps/turtle.lua` or choose **Turtle Channel** from boot. Main menu stays simple:
+
+- Set/generate auth token.
+- Discover/control remote turtles.
+- Channel status/next steps.
+
+Advanced server/manual setup contains server startup, server name, manual server/client commands, and advanced onboarding. Agents can control remote turtles with `<craftmind-turtle ...>` tools after discovery. Guide users to the simple Turtle Channel path first; use manual commands only when they ask or need recovery.
+
 ## Onboarding
 
 Run `craftmind/apps/setup.lua` or choose **Onboarding / Setup** from boot. The flow mirrors OpenClaw but stays ComputerCraft-native:

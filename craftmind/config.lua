@@ -1,6 +1,6 @@
 local config = {
   name = "CraftMind",
-  version = "0.3.4",
+  version = "0.3.5",
   namespace = "craftmind",
   mission = "Build the OpenClaw idea for ComputerCraft: an AI-first ComputerCraft workspace agent.",
 
