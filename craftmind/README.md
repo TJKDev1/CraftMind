@@ -25,9 +25,9 @@ Modular ComputerCraft AI framework for chat, docs-aware help, file creation, and
 - `docs/index.lua` — curated local docs search
 - `tools/file.lua` — file read/write helper
 
-## Install from public GitHub
+## Install / Update from public GitHub
 
-Set `OWNER`, `REPO`, and `BRANCH` at top of root `install.lua`, then publish repo. In ComputerCraft:
+Installer detects fresh install, update, reinstall, and repair by reading `/craftmind/manifest.lua`. In ComputerCraft:
 
 ```lua
 wget run https://raw.githubusercontent.com/TJKDev1/CraftMind/main/install.lua

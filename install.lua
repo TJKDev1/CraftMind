@@ -4,6 +4,7 @@ local OWNER = "TJKDev1"
 local REPO = "CraftMind"
 local BRANCH = "main"
 local BASE_DIR = "craftmind"
+local REMOTE_VERSION = "0.1.1"
 
 local files = {
   "README.md",
@@ -31,6 +32,8 @@ local files = {
   "client/remote.lua",
 }
 
+local stats = { downloaded = 0, updated = 0, unchanged = 0 }
+
 local function ensureHttp()
   if not http then error("HTTP API disabled. Enable http in ComputerCraft server config.") end
 end
@@ -38,6 +41,26 @@ end
 local function ensureDir(path)
   local dir = fs.getDir(path)
   if dir ~= "" and not fs.exists(dir) then fs.makeDir(dir) end
+end
+
+local function readFile(path)
+  if not fs.exists(path) then return nil end
+  local f = fs.open(path, "r")
+  local body = f.readAll()
+  f.close()
+  return body
+end
+
+local function currentVersion()
+  local manifestPath = fs.combine(BASE_DIR, "manifest.lua")
+  if not fs.exists(BASE_DIR) then return nil, "missing" end
+  if not fs.exists(manifestPath) then return nil, "no_manifest" end
+
+  local ok, manifest = pcall(dofile, manifestPath)
+  if ok and type(manifest) == "table" and manifest.version then
+    return tostring(manifest.version), "ok"
+  end
+  return nil, "bad_manifest"
 end
 
 local function rawUrl(path)
@@ -54,24 +77,49 @@ local function download(path)
   local body = res.readAll()
   res.close()
   if code < 200 or code >= 300 then return false, "HTTP " .. tostring(code) .. " from " .. url end
+
+  local old = readFile(target)
   ensureDir(target)
   local f = fs.open(target, "w")
   f.write(body)
   f.close()
+
+  stats.downloaded = stats.downloaded + 1
+  if old == body then stats.unchanged = stats.unchanged + 1 else stats.updated = stats.updated + 1 end
   return true
 end
 
 local function install()
   ensureHttp()
+
+  local oldVersion, state = currentVersion()
+  local action
+  if state == "missing" then
+    action = "Installing"
+  elseif state == "ok" and oldVersion == REMOTE_VERSION then
+    action = "Reinstalling/updating"
+  elseif state == "ok" then
+    action = "Updating"
+  else
+    action = "Repairing"
+  end
+
   print("CraftMind installer")
   print("Source: " .. OWNER .. "/" .. REPO .. "@" .. BRANCH)
+  print("Mode: " .. action)
+  print("Current: " .. tostring(oldVersion or state))
+  print("Target: " .. REMOTE_VERSION)
   print("")
+
   for _, path in ipairs(files) do
     local ok, err = download(path)
     if not ok then error("Failed to download " .. path .. ": " .. tostring(err)) end
   end
+
   print("")
-  print("Install complete.")
+  print(action .. " complete.")
+  print("Files checked: " .. stats.downloaded)
+  print("Changed: " .. stats.updated .. " | Unchanged: " .. stats.unchanged)
   print("Run: /craftmind/boot.lua")
 end
 

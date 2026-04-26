@@ -1,6 +1,6 @@
 return {
   name = "CraftMind",
-  version = "0.1.0",
+  version = "0.1.1",
   files = {
     "README.md",
     "config.lua",

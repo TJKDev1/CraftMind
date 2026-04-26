@@ -20,7 +20,7 @@ Early rewrite skeleton. Core modules exist, but APIs and UX may change.
 - Rednet turtle server skeleton
 - Public GitHub installer
 
-## Install
+## Install / Update
 
 In ComputerCraft:
 
@@ -28,7 +28,7 @@ In ComputerCraft:
 wget run https://raw.githubusercontent.com/TJKDev1/CraftMind/main/install.lua
 ```
 
-If your repository name is different, edit `OWNER`, `REPO`, and `BRANCH` at top of `install.lua` before publishing.
+Installer detects fresh install, update, reinstall, and repair by reading `/craftmind/manifest.lua`.
 
 ## Run
 
