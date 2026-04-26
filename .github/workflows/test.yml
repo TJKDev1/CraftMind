@@ -17,8 +17,8 @@ jobs:
       - name: Install Lua and CraftOS-PC
         run: |
           sudo apt-get update
-          sudo apt-get install -y lua5.2 luarocks flatpak
-          sudo luarocks install luacheck
+          sudo apt-get install -y lua5.2 liblua5.2-dev luarocks flatpak
+          sudo luarocks --lua-version=5.2 install luacheck LUA_INCDIR=/usr/include/lua5.2
           flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
           flatpak install -y flathub cc.craftos_pc.CraftOS-PC
 
