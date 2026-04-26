@@ -40,7 +40,17 @@ function M.discover(timeout)
   while os.clock() < deadline do
     local id, msg = rednet.receive(PROTOCOL, 0.5)
     if id and type(msg) == "table" and msg.type == "discover_result" then
-      table.insert(found, { id = id, name = msg.name, safety = msg.safety, remote_auth = msg.remote_auth, turtle = msg.turtle })
+      table.insert(found, {
+        id = id,
+        name = msg.name,
+        label = msg.label,
+        safety = msg.safety,
+        remote_auth = msg.remote_auth,
+        turtle = msg.turtle,
+        uptime = msg.uptime,
+        requests = msg.requests,
+        modem = msg.modem,
+      })
     end
   end
   return found

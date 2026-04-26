@@ -45,6 +45,9 @@ assert(recent[1].content == "hello", "session content mismatch")
 
 local ops = tools.extract([[<craftmind-list path="." />]])
 assert(#ops == 1 and ops[1].type == "list", "tool extract failed")
+local turtleOps = tools.extract([[<craftmind-turtle action="discover" /><craftmind-turtle action="run_lua" id="1">print("hi")</craftmind-turtle>]])
+assert(#turtleOps == 2 and turtleOps[1].type == "turtle" and turtleOps[1].action == "discover", "turtle tool extract failed")
+assert(turtleOps[2].code:find("print", 1, true), "turtle run_lua body missing")
 local ok, result = tools.run(ops[1])
 assert(ok, "tool list failed: " .. tostring(result))
 

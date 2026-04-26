@@ -106,8 +106,11 @@ Use exact XML blocks, no markdown fences around blocks:
 - `<craftmind-exec command="ls" />` runs shell commands only in power mode.
 - `<craftmind-lua>...</craftmind-lua>` runs Lua only in power mode.
 - `<craftmind-message to="agent-id">...</craftmind-message>` messages another CraftMind agent.
+- `<craftmind-turtle action="discover" />` discovers CraftMind turtle servers.
+- `<craftmind-turtle action="status|inventory|inspect|select|refuel" id="12" />` controls a remote turtle using configured auth token.
+- `<craftmind-turtle action="run_lua" id="12">...</craftmind-turtle>` runs remote Lua only when `safety=power` locally and on the server.
 
-Prefer read/list before write. Keep shell/Lua commands tiny and non-interactive.
+Prefer read/list before write. Prefer turtle discover -> status -> inspect -> act. Ask before destructive turtle actions, movement, digging, placing, dropping, or remote Lua.
 ]])
 
   writeIfMissing(fs.combine(r, "HEARTBEAT.md"), [[# Heartbeat
@@ -132,6 +135,9 @@ Durable workspace memory for facts, plans, and decisions that apply beyond one c
   end
   replaceAllIfExists(fs.combine(r, "USER.md"), "power/admin only", "power mode only")
   replaceAllIfExists(fs.combine(r, "TOOLS.md"), "power/admin mode", "power mode")
+  if not readIfExists(fs.combine(r, "TOOLS.md")):find("craftmind%-turtle", 1, false) then
+    replaceAllIfExists(fs.combine(r, "TOOLS.md"), "- `<craftmind-message to=\"agent-id\">...</craftmind-message>` messages another CraftMind agent.", "- `<craftmind-message to=\"agent-id\">...</craftmind-message>` messages another CraftMind agent.\n- `<craftmind-turtle action=\"discover\" />` discovers CraftMind turtle servers.\n- `<craftmind-turtle action=\"status|inventory|inspect|select|refuel\" id=\"12\" />` controls a remote turtle using configured auth token.\n- `<craftmind-turtle action=\"run_lua\" id=\"12\">...</craftmind-turtle>` runs remote Lua only when `safety=power` locally and on the server.")
+  end
 
   return r
 end

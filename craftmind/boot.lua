@@ -19,9 +19,8 @@ while true do
     { label = "Agents / Hatch", run = function() shell.run("/craftmind/apps/agents.lua") end },
     { label = "Chat", run = function() shell.run("/craftmind/apps/chat.lua") end },
     { label = "Agent Workspace", run = function() shell.run("/craftmind/apps/agent.lua") end },
-    { label = "Remote Turtles", run = function() shell.run("/craftmind/apps/remote.lua") end },
+    { label = "Turtle Channel (auth, server, remote)", run = function() shell.run("/craftmind/apps/turtle.lua") end },
     { label = "Onboarding / Setup", run = function() shell.run("/craftmind/apps/setup.lua") end },
-    { label = "Turtle Server", run = function() shell.run("/craftmind/turtle/server.lua") end },
     { label = "Exit", run = function() return "exit" end },
   })
   if not choice then break end

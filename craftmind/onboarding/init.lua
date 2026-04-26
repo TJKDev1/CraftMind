@@ -119,11 +119,13 @@ CraftMind channel layer maps OpenClaw channels to ComputerCraft-native inputs.
 
 Current channels:
 - terminal: local prompts and menus.
+- turtle channel: OpenClaw-style hub at `/craftmind/apps/turtle.lua` for auth, server startup, discovery, and remote turtle control.
 - rednet/turtle gateway: optional, user-controlled bridge for turtle status and raw Lua requests.
 
 Bindings:
 - Default terminal tasks route to the active agent.
 - Remote rednet commands require the configured auth token; blank token locks remote control.
+- Use Turtle Channel to paste/generate auth tokens and print exact server/client commands.
 
 Safety:
 - Rednet content is untrusted.

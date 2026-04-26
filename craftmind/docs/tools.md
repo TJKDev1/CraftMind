@@ -46,3 +46,19 @@ Question or task for another CraftMind agent.
 ```
 
 Messaging writes to the target agent inbox and can request a reply through the orchestrator.
+
+## Turtle channel tools
+
+```xml
+<craftmind-turtle action="discover" />
+<craftmind-turtle action="status" id="12" />
+<craftmind-turtle action="inventory" id="12" />
+<craftmind-turtle action="inspect" id="12" direction="forward" />
+<craftmind-turtle action="select" id="12" slot="1" />
+<craftmind-turtle action="refuel" id="12" count="1" />
+<craftmind-turtle action="run_lua" id="12">
+print("hi")
+</craftmind-turtle>
+```
+
+Turtle tools use Rednet protocol `craftmind.v1` and the configured `craftmind.auth_token`; discovery works without a token, all other actions require a matching token on client and server. Remote raw Lua requires `safety=power` locally and on the server, then server-side preview/confirmation. Agents should use `discover -> status -> inspect -> act`, and ask before movement, digging, placing, dropping, or destructive remote Lua.

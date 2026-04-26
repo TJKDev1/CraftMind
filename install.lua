@@ -5,7 +5,7 @@ local OWNER = "TJKDev1"
 local REPO = "CraftMind"
 local BRANCH = "main"
 local BASE_DIR = "craftmind"
-local REMOTE_VERSION = "0.3.1"
+local REMOTE_VERSION = "0.3.3"
 local CACHE_BUST = tostring((os.epoch and os.epoch("utc")) or os.time())
 
 local files = {
@@ -45,6 +45,7 @@ local files = {
   "apps/agent.lua",
   "apps/agents.lua",
   "apps/remote.lua",
+  "apps/turtle.lua",
   "turtle/server.lua",
   "client/remote.lua",
 }

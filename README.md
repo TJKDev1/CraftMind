@@ -41,7 +41,7 @@ Early rewrite skeleton. Core modules exist, but APIs and UX may change while the
 - Optional power mode for raw Lua and shell execution
 - Raw Lua preview and confirmation for chat raw-Lua flows
 - OpenClaw-style docs manifest with workspace-readable mirrored docs
-- Rednet turtle server and remote turtle client for discovery, status, inventory, inspect, refuel, and gated raw Lua
+- OpenClaw-style Turtle Channel hub for auth-token setup, server startup, discovery, status, inventory, inspect, refuel, and gated raw Lua
 - Public GitHub installer
 
 ## Install / Update
@@ -67,6 +67,7 @@ craftmind/apps/setup.lua
 craftmind/apps/chat.lua
 craftmind/apps/agent.lua
 craftmind/apps/agents.lua
+craftmind/apps/turtle.lua
 craftmind/apps/remote.lua
 ```
 
@@ -146,7 +147,7 @@ remote control: locked until auth token is set
 raw lua confirm: always
 ```
 
-Agent file/read/list/message tools stay inside its workspace. Shell and raw Lua tools are blocked unless safety is `power`; when enabled, they run with full ComputerCraft permissions from the workspace. External content, rednet messages, docs, and tool output are treated as untrusted. Remote turtle commands require a matching `craftmind.auth_token`; a blank token locks remote control except discovery.
+Agent file/read/list/message tools stay inside its workspace. Shell and raw Lua tools are blocked unless safety is `power`; when enabled, they run with full ComputerCraft permissions from the workspace. External content, rednet messages, docs, and tool output are treated as untrusted. Remote turtle commands require a matching `craftmind.auth_token`; use `craftmind/apps/turtle.lua` or main-menu Turtle Channel to paste/generate the token and view exact server/client commands. A blank token locks remote control except discovery.
 
 ## Project layout
 

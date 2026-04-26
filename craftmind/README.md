@@ -43,7 +43,8 @@ Prioritize ComputerCraft-native agent workflows, turtle/rednet use cases, Lua co
 - `ai/runtime_pipeline.lua` — runtime stages: channel → route → context → model → tools → persist
 - `ai/workspace_agent.lua` — OpenClaw-style agent prompt loop
 - `ai/workspace_tools.lua` — workspace file/read/list/shell/Lua tools
-- `turtle/server.lua` — Rednet turtle server with discovery/status/inventory/inspect/refuel/gated Lua
+- `apps/turtle.lua` — OpenClaw-style Turtle Channel hub for auth-token setup, server startup, discovery, and remote control
+- `turtle/server.lua` — Rednet turtle server with better startup/status UX and discovery/status/inventory/inspect/refuel/gated Lua
 - `client/remote.lua` — discovery/status/inventory/inspect/refuel/run client library
 - `apps/remote.lua` — terminal UI for remote turtle servers
 - `docs/index.lua` — docs manifest plus optional RAG search over workspace docs
@@ -75,6 +76,7 @@ Or:
 craftmind/apps/setup.lua
 craftmind/apps/chat.lua
 craftmind/apps/agent.lua
+craftmind/apps/turtle.lua
 ```
 
 ## Onboarding
@@ -144,7 +146,7 @@ Agent gets dedicated workspace (`/craftmind/workspace` by default). It can list/
 
 Default mode is safe. Raw Lua and shell execution are blocked unless safety is `power`. Workspace file/list/read/message tools remain workspace-scoped. Preview + confirmation is enabled by default for chat raw-Lua flows.
 
-Remote turtle commands require a matching `craftmind.auth_token` on the server. A blank token locks remote control except discovery. The Remote Turtles app can discover servers, query status/inventory, inspect blocks, select/refuel slots, and request raw Lua; server-side safety gates still apply.
+Remote turtle commands require a matching `craftmind.auth_token` on the server. Use `craftmind/apps/turtle.lua` or the main-menu Turtle Channel to paste/generate the token and show exact server/client commands. A blank token locks remote control except discovery. The Remote Turtles app can discover servers, query status/inventory, inspect blocks, select/refuel slots, and request raw Lua; server-side safety gates still apply.
 
 ## Provider notes
 

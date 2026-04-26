@@ -4,6 +4,7 @@ local fileTool = require("craftmind.tools.file")
 local luaAgent = require("craftmind.ai.lua_agent")
 local orchestrator = require("craftmind.ai.orchestrator")
 local identity = require("craftmind.identity")
+local remote = require("craftmind.client.remote")
 
 local M = {}
 
@@ -27,6 +28,11 @@ end
 
 local function stripBlock(text)
   return (text or ""):gsub("^\n", ""):gsub("\n$", "")
+end
+
+local function serialize(value)
+  if type(value) == "table" and textutils and textutils.serialize then return textutils.serialize(value) end
+  return tostring(value)
 end
 
 local function escapePattern(text)
@@ -201,6 +207,38 @@ function M.runLua(code)
   return true, output
 end
 
+function M.runTurtle(op)
+  local action = trim(op.action or "")
+  local id = tonumber(op.id)
+  local auth = settingsx.authToken() or ""
+  local res, err
+  if action == "discover" then
+    res, err = remote.discover(tonumber(op.timeout) or 3)
+  else
+    if not id then return false, "turtle id required" end
+    if auth == "" then return false, "auth token missing; set craftmind.auth_token via Turtle Channel" end
+    if action == "status" then
+      res, err = remote.status(id, auth)
+    elseif action == "inventory" then
+      res, err = remote.inventory(id, auth)
+    elseif action == "inspect" then
+      res, err = remote.inspect(id, op.direction or "forward", auth)
+    elseif action == "select" then
+      res, err = remote.select(id, tonumber(op.slot), auth)
+    elseif action == "refuel" then
+      res, err = remote.refuel(id, tonumber(op.count) or 1, auth)
+    elseif action == "run_lua" then
+      if not M.canRun() then return false, "remote raw Lua blocked by safety setting" end
+      res, err = remote.runLua(id, op.code or "", auth)
+    else
+      return false, "unknown turtle action: " .. tostring(action)
+    end
+  end
+  if not res then return false, err end
+  if type(res) == "table" and res.type == "error" then return false, res.error or serialize(res) end
+  return true, truncate(serialize(res), 4000)
+end
+
 function M.extract(text)
   local ops = {}
   text = text or ""
@@ -275,6 +313,16 @@ function M.extract(text)
     return { type = "message", to = attrs.to or attrs.agent or attrs.id, from = attrs.from, content = stripBlock(body) }
   end)
 
+  scanSelf("<craftmind%-turtle(.-)/>", function(attrText)
+    local attrs = parseAttrs(attrText)
+    return { type = "turtle", action = attrs.action, id = attrs.id, direction = attrs.direction, slot = attrs.slot, count = attrs.count, timeout = attrs.timeout }
+  end)
+
+  scanBlock("<craftmind%-turtle(.-)>(.-)</craftmind%-turtle>", function(attrText, body)
+    local attrs = parseAttrs(attrText)
+    return { type = "turtle", action = attrs.action, id = attrs.id, direction = attrs.direction, slot = attrs.slot, count = attrs.count, timeout = attrs.timeout, code = stripBlock(body) }
+  end)
+
   table.sort(ops, function(a, b) return a._pos < b._pos end)
   for _, op in ipairs(ops) do op._pos = nil end
   return ops
@@ -287,9 +335,11 @@ function M.stripToolBlocks(text)
   text = text:gsub("<craftmind%-lua>.-</craftmind%-lua>", "")
   text = text:gsub("<craftmind%-exec.->.-</craftmind%-exec>", "")
   text = text:gsub("<craftmind%-message.->.-</craftmind%-message>", "")
+  text = text:gsub("<craftmind%-turtle.->.-</craftmind%-turtle>", "")
   text = text:gsub("<craftmind%-read.*/>", "")
   text = text:gsub("<craftmind%-list.*/>", "")
   text = text:gsub("<craftmind%-exec.*/>", "")
+  text = text:gsub("<craftmind%-turtle.*/>", "")
   return trim(text)
 end
 
@@ -341,6 +391,8 @@ function M.run(op)
   elseif op.type == "message" then
     local from = op.from or (identity.defaultAgentId and identity.defaultAgentId()) or "main"
     return orchestrator.sendMessage(from, op.to, op.content)
+  elseif op.type == "turtle" then
+    return M.runTurtle(op)
   end
   return false, "unknown op: " .. tostring(op.type)
 end

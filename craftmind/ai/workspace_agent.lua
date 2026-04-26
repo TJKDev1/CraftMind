@@ -37,8 +37,18 @@ print("hi")
 <craftmind-message to="agent-id">
 Short task or question for the other agent.
 </craftmind-message>
+- Control remote turtle channel with configured auth token:
+<craftmind-turtle action="discover" />
+<craftmind-turtle action="status" id="12" />
+<craftmind-turtle action="inventory" id="12" />
+<craftmind-turtle action="inspect" id="12" direction="forward" />
+<craftmind-turtle action="select" id="12" slot="1" />
+<craftmind-turtle action="refuel" id="12" count="1" />
+<craftmind-turtle action="run_lua" id="12">
+print("hi")
+</craftmind-turtle>
 
-File/read/list paths are relative to workspace and cannot escape it. Shell/Lua run with full ComputerCraft permissions, so be careful with absolute paths. Prefer small, inspectable steps. Avoid interactive commands because they can hang. Docs live under `.craftmind/docs`; use list/read before relying on detailed docs. Your identity lives in workspace files under .craftmind/agents/<id>/ such as identity.md, soul.md, tools.md, memory.md, and inbox.md; you may inspect or update them when asked to refine yourself. When done, reply with concise summary and no tool blocks.]]
+File/read/list paths are relative to workspace and cannot escape it. Shell/Lua run with full ComputerCraft permissions, so be careful with absolute paths. Turtle actions use rednet and require matching `craftmind.auth_token`; blank token locks remote control except discovery. Remote raw Lua additionally requires `safety=power` locally and on the server. Prefer discover -> status -> inspect -> act. Ask before destructive actions, movement, digging, placing, dropping, or long-running remote Lua. Prefer small, inspectable steps. Avoid interactive commands because they can hang. Docs live under `.craftmind/docs`; use list/read before relying on detailed docs. Your identity lives in workspace files under .craftmind/agents/<id>/ such as identity.md, soul.md, tools.md, memory.md, and inbox.md; you may inspect or update them when asked to refine yourself. When done, reply with concise summary and no tool blocks.]]
 
 function M.buildMessages(task, prior, opts)
   opts = opts or {}
