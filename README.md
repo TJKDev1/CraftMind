@@ -25,7 +25,7 @@ Early rewrite skeleton. Core modules exist, but APIs and UX may change.
 In ComputerCraft:
 
 ```lua
-wget run https://raw.githubusercontent.com/TJKDev1/CraftMind/refs/heads/main/install.lua
+wget run https://raw.githubusercontent.com/TJKDev1/CraftMind/main/install.lua
 ```
 
 If your repository name is different, edit `OWNER`, `REPO`, and `BRANCH` at top of `install.lua` before publishing.

@@ -39,7 +39,7 @@ local function ensureDir(path)
 end
 
 local function rawUrl(path)
-  return "https://raw.githubusercontent.com/" .. OWNER .. "/" .. REPO .. "/refs/heads/" .. BRANCH .. "/" .. BASE_DIR .. "/" .. path
+  return "https://raw.githubusercontent.com/" .. OWNER .. "/" .. REPO .. "/" .. BRANCH .. "/" .. BASE_DIR .. "/" .. path
 end
 
 local function download(path)

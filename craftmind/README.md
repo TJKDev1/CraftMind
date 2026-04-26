@@ -28,7 +28,7 @@ Modular ComputerCraft AI framework for chat, docs-aware help, file creation, and
 Set `OWNER`, `REPO`, and `BRANCH` at top of root `install.lua`, then publish repo. In ComputerCraft:
 
 ```lua
-wget run https://raw.githubusercontent.com/TJKDev1/CraftMind/refs/heads/main/install.lua
+wget run https://raw.githubusercontent.com/TJKDev1/CraftMind/main/install.lua
 ```
 
 ## Run in ComputerCraft
