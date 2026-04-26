@@ -3,7 +3,7 @@ package.path = "/?.lua;/?/init.lua;" .. package.path
 local settingsx = require("craftmind.core.settings")
 local config = require("craftmind.config")
 local render = require("craftmind.ui.render")
-local agent = require("craftmind.ai.workspace_agent")
+local pipeline = require("craftmind.ai.runtime_pipeline")
 local tools = require("craftmind.ai.workspace_tools")
 local identity = require("craftmind.identity")
 local session = require("craftmind.ai.session")
@@ -46,35 +46,17 @@ while true do
     identity.setDefaultAgent(id)
     print("Active agent: " .. activeAgent)
   elseif task ~= "" then
-    local sessionId = "terminal-" .. activeAgent
-    local prior = session.recent(sessionId, 12)
-    table.insert(prior, { role = "user", content = task })
-    session.append(sessionId, "user", task)
-    local hitLimit = true
-    local aborted = false
-    for step = 1, maxSteps() do
-      print("\n-- step " .. step .. " --")
-      local reply, err = agent.ask(task, prior, { agentId = activeAgent, taskInPrior = true })
-      if not reply then render.error(err); aborted = true; break end
-
-      local display = tools.stripToolBlocks(reply)
-      if display ~= "" then render.renderAssistant(display) end
-
-      local ops = tools.extract(reply)
-      table.insert(prior, { role = "assistant", content = reply })
-      session.append(sessionId, "assistant", reply)
-
-      if #ops == 0 then
-        hitLimit = false
-        break
-      end
-
-      print("\nRunning " .. #ops .. " tool(s)...")
-      local obs = tools.runAll(ops)
-      print(obs)
-      table.insert(prior, { role = "user", content = "Tool observations:\n" .. obs })
-      session.append(sessionId, "user", "Tool observations:\n" .. obs)
-    end
-    if hitLimit and not aborted then print("Step limit reached.") end
+    local ok, errOrResult, result = pipeline.run(task, {
+      agentId = activeAgent,
+      sessionId = "terminal-" .. activeAgent,
+      maxSteps = maxSteps(),
+      onStep = function(step) print("\n-- step " .. step .. " --") end,
+      onAssistant = function(display) render.renderAssistant(display) end,
+      onTools = function(ops) print("\nRunning " .. #ops .. " tool(s)...") end,
+      onObservation = function(obs) print(obs) end,
+    })
+    if not ok then render.error(errOrResult) end
+    result = ok and errOrResult or result
+    if result and result.hitLimit then print("Step limit reached.") end
   end
 end

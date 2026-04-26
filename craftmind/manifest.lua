@@ -18,6 +18,7 @@ return {
     "ai/tool_runner.lua",
     "ai/context.lua",
     "ai/session.lua",
+    "ai/runtime_pipeline.lua",
     "ai/workspace_agent.lua",
     "ai/workspace_tools.lua",
     "ai/orchestrator.lua",
