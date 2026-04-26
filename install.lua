@@ -5,7 +5,7 @@ local OWNER = "TJKDev1"
 local REPO = "CraftMind"
 local BRANCH = "main"
 local BASE_DIR = "craftmind"
-local REMOTE_VERSION = "0.2.0"
+local REMOTE_VERSION = "0.3.0"
 local CACHE_BUST = tostring((os.epoch and os.epoch("utc")) or os.time())
 
 local files = {
@@ -24,15 +24,24 @@ local files = {
   "ai/chat.lua",
   "ai/lua_agent.lua",
   "ai/tool_runner.lua",
+  "ai/context.lua",
+  "ai/session.lua",
   "ai/workspace_agent.lua",
   "ai/workspace_tools.lua",
+  "ai/orchestrator.lua",
+  "identity/init.lua",
   "docs/index.lua",
+  "docs/craftmind.md",
+  "docs/agents.md",
+  "docs/tools.md",
+  "docs/openclaw-adaptation.md",
   "tools/file.lua",
   "ui/menu.lua",
   "ui/render.lua",
   "apps/setup.lua",
   "apps/chat.lua",
   "apps/agent.lua",
+  "apps/agents.lua",
   "turtle/server.lua",
   "client/remote.lua",
 }

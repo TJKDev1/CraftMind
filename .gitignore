@@ -13,6 +13,7 @@ skills-lock.json
 # ComputerCraft local runtime state
 logs/
 *.log
+.craftos-test/
 
 # Object files
 *.o

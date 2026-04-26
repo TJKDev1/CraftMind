@@ -1,6 +1,6 @@
 local config = {
   name = "CraftMind",
-  version = "0.2.0",
+  version = "0.3.0",
   namespace = "craftmind",
   mission = "Build the OpenClaw idea for ComputerCraft: an AI-first ComputerCraft workspace agent.",
 
@@ -12,6 +12,7 @@ local config = {
     docsMode = "curated", -- curated | full | off
     workspace = "/craftmind/workspace",
     agentMaxSteps = 8,
+    defaultAgent = "main",
   },
 
   settings = {
@@ -23,6 +24,7 @@ local config = {
     docsMode = "craftmind.docs_mode",
     workspace = "craftmind.workspace",
     agentMaxSteps = "craftmind.agent_max_steps",
+    defaultAgent = "craftmind.default_agent",
 
     groqKey = "craftmind.api_key.groq",
     geminiKey = "craftmind.api_key.gemini",

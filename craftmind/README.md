@@ -11,6 +11,11 @@ The project name stays **CraftMind**. OpenClaw describes the idea, scope, and ag
 - Private-first project structure
 - Multiplayer-safe defaults
 - Autonomous tool loops for list/read/write/shell/Lua operations
+- OpenClaw-style bootstrap context with `AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `HEARTBEAT.md`, and `MEMORY.md`
+- Hatchable agent identity with `soul.md`, `identity.md`, `tools.md`, `memory.md`, and `inbox.md`
+- Persistent terminal sessions under `.craftmind/sessions/*.jsonl`
+- Compact skill list with on-demand `SKILL.md` loading from `skills/` or `.craftmind/skills/`
+- Optional multi-agent messaging/orchestration while keeping one default agent by default
 - Power mode for raw Lua/shell execution when explicitly enabled
 - Modular providers: Groq, Gemini, NVIDIA NIM, OpenAI-compatible APIs
 - Curated bundled docs first, optional full ComputerCraft docs later
@@ -33,11 +38,16 @@ Prioritize ComputerCraft-native agent workflows, turtle/rednet use cases, Lua co
 - `providers/` — provider abstraction
 - `ai/lua_agent.lua` — raw Lua preview/confirm executor
 - `ai/tool_runner.lua` — confirmed file write/append tool blocks
+- `ai/context.lua` — OpenClaw-style bootstrap/context/skills assembler
+- `ai/session.lua` — ComputerCraft-friendly session JSONL persistence
 - `ai/workspace_agent.lua` — OpenClaw-style agent prompt loop
 - `ai/workspace_tools.lua` — workspace file/read/list/shell/Lua tools
 - `turtle/server.lua` — Rednet turtle server skeleton
 - `client/remote.lua` — discovery/run client library
-- `docs/index.lua` — curated local docs search
+- `docs/index.lua` — curated local docs search plus markdown docs loader
+- `docs/*.md` — CraftMind documentation visible to agents
+- `identity/init.lua` — hatching, identity context, memory/inbox helpers
+- `ai/orchestrator.lua` — agent-to-agent message/reply helper
 - `tools/file.lua` — file read/write helper
 
 ## Install / Update from public GitHub
@@ -64,6 +74,40 @@ craftmind/apps/chat.lua
 craftmind/apps/agent.lua
 ```
 
+## Hatching and agent identity
+
+Run:
+
+```lua
+craftmind/apps/agents.lua
+```
+
+Use `Hatch / activate agent` to give the assistant an id, a name, and a ComputerCraft-focused soul. CraftMind also creates OpenClaw-style workspace bootstrap files:
+
+```txt
+/craftmind/workspace/
+  AGENTS.md
+  SOUL.md
+  USER.md
+  TOOLS.md
+  HEARTBEAT.md
+  MEMORY.md
+  .craftmind/agents/main/
+    identity.md
+    soul.md
+    tools.md
+    memory.md
+    inbox.md
+    orchestration.md
+  .craftmind/docs/
+    craftmind.md
+    self-modification.md
+  .craftmind/sessions/
+    terminal-main.jsonl
+```
+
+Chat and Agent Workspace include these files as prompt context. The files are workspace-scoped, so the agent can read or modify its own bootstrap, identity, memory, and local docs through normal tools when asked. Multi-agent messaging is available with `<craftmind-message to="agent-id">...</craftmind-message>`, but the default flow is still one agent.
+
 ## Agent Workspace
 
 Run from menu or directly:
@@ -72,11 +116,11 @@ Run from menu or directly:
 craftmind/apps/agent.lua
 ```
 
-Agent gets dedicated workspace (`/craftmind/workspace` by default). It can list/read/write workspace files and auto-run shell/Lua tool blocks. Execution is blocked unless safety is `power` or profile is `admin`.
+Agent gets dedicated workspace (`/craftmind/workspace` by default). It can list/read/write workspace files and exchange agent messages in safe mode. Shell/Lua tool blocks are blocked unless safety is `power` or profile is `admin`.
 
 ## Safety defaults
 
-Default mode is safe. Raw Lua and agent execution are blocked unless safety is `power` or profile is `admin`. Preview + confirmation is enabled by default for chat raw-Lua flows.
+Default mode is safe. Raw Lua and shell execution are blocked unless safety is `power` or profile is `admin`. Workspace file/list/read/message tools remain workspace-scoped. Preview + confirmation is enabled by default for chat raw-Lua flows.
 
 For multiplayer servers, set `craftmind.auth_token` on turtle servers before remote execution.
 

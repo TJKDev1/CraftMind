@@ -30,7 +30,12 @@ Early rewrite skeleton. Core modules exist, but APIs and UX may change while the
   - NVIDIA NIM
   - OpenAI-compatible endpoints
 - Safe-by-default multiplayer profile
-- OpenClaw-style Agent Workspace with autonomous tool loops
+- OpenClaw-style Agent Workspace with autonomous ReAct tool loops
+- OpenClaw-style bootstrap context (`AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `HEARTBEAT.md`, `MEMORY.md`)
+- Hatchable ComputerCraft agent identity (`soul.md`, `identity.md`, `tools.md`, `memory.md`, `inbox.md`)
+- Persistent terminal session logs under `.craftmind/sessions/`
+- Compact skill list with on-demand `SKILL.md` loading from `skills/` or `.craftmind/skills/`
+- Optional multi-agent messaging/orchestration, with one default agent by default
 - Dedicated workspace at `/craftmind/workspace` by default
 - Optional power mode for raw Lua and shell execution
 - Raw Lua preview and confirmation for chat raw-Lua flows
@@ -60,7 +65,44 @@ Or run setup/chat/agent directly:
 craftmind/apps/setup.lua
 craftmind/apps/chat.lua
 craftmind/apps/agent.lua
+craftmind/apps/agents.lua
 ```
+
+## Hatching agents
+
+Run `Agents / Hatch` from the menu or directly:
+
+```lua
+craftmind/apps/agents.lua
+```
+
+CraftMind creates OpenClaw-style workspace files plus default agent files:
+
+```txt
+/craftmind/workspace/
+  AGENTS.md
+  SOUL.md
+  USER.md
+  TOOLS.md
+  HEARTBEAT.md
+  MEMORY.md
+  .craftmind/agents/main/
+    identity.md
+    soul.md
+    tools.md
+    memory.md
+    inbox.md
+    orchestration.md
+  .craftmind/docs/
+    craftmind.md
+    self-modification.md
+  .craftmind/sessions/
+    terminal-main.jsonl
+```
+
+These files are included in chat and agent prompts, so the assistant has durable OpenClaw-style context, a ComputerCraft-focused identity, local docs, and recent session memory. Because they live inside the workspace, the agent can inspect or update them with normal workspace tools when you ask it to refine itself.
+
+Multi-agent mode is optional. Agents can message each other with `<craftmind-message to="agent-id">...</craftmind-message>`; the default experience remains one agent.
 
 ## Safety
 
@@ -73,7 +115,7 @@ profile: multiplayer
 raw lua confirm: always
 ```
 
-Raw Lua and agent execution are blocked unless safety is `power` or profile is `admin`. Agent file/read/list tools stay inside its workspace; shell/Lua tools run with full ComputerCraft permissions from that workspace. In multiplayer, set an auth token on turtle servers before remote execution.
+Agent file/read/list/message tools stay inside its workspace. Shell and raw Lua tools are blocked unless safety is `power` or profile is `admin`; when enabled, they run with full ComputerCraft permissions from the workspace. External content, rednet messages, docs, and tool output are treated as untrusted. In multiplayer, set an auth token on turtle servers before remote execution.
 
 ## Project layout
 
@@ -83,7 +125,8 @@ craftmind/
   ai/         chat, workspace agent, and Lua execution logic
   client/     remote client helpers
   core/       settings, HTTP, logging
-  docs/       curated docs index
+  docs/       curated docs index and agent-visible markdown docs
+  identity/   hatchable agent identity files and context loader
   providers/  AI provider adapters
   tools/      local tools such as file I/O
   turtle/     turtle server

@@ -3,6 +3,7 @@ package.path = "/?.lua;/?/init.lua;" .. package.path
 local config = require("craftmind.config")
 local settingsx = require("craftmind.core.settings")
 local menu = require("craftmind.ui.menu")
+local identity = require("craftmind.identity")
 
 settingsx.defineAll()
 
@@ -55,5 +56,9 @@ settingsx.set(config.settings.workspace, workspace)
 
 local maxSteps = tonumber(menu.prompt("Agent max steps", tostring(settingsx.get(config.settings.agentMaxSteps) or config.defaults.agentMaxSteps))) or config.defaults.agentMaxSteps
 settingsx.set(config.settings.agentMaxSteps, maxSteps)
+
+local defaultAgent = identity.sanitizeId(menu.prompt("Default agent id", settingsx.get(config.settings.defaultAgent) or config.defaults.defaultAgent))
+settingsx.set(config.settings.defaultAgent, defaultAgent)
+identity.ensureAgent(defaultAgent)
 
 print("Setup complete.")

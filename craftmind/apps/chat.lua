@@ -5,14 +5,18 @@ local chat = require("craftmind.ai.chat")
 local config = require("craftmind.config")
 local render = require("craftmind.ui.render")
 local tools = require("craftmind.ai.tool_runner")
+local identity = require("craftmind.identity")
 
 settingsx.defineAll()
 
 local history = {}
+local activeAgent = identity.defaultAgentId()
+identity.ensureAgent(activeAgent)
 
 print("CraftMind Chat v" .. config.version)
 print("Provider: " .. settingsx.provider() .. " | Model: " .. tostring(settingsx.model()))
-print("Type /quit to exit. /settings to show config.")
+print("Agent: " .. activeAgent .. " (identity: .craftmind/agents/" .. activeAgent .. ")")
+print("Type /quit to exit. /settings to show config. /agent <id> switches.")
 
 while true do
   write("\nYou> ")
@@ -24,8 +28,17 @@ while true do
     print("safety=" .. tostring(settingsx.safety()))
     print("profile=" .. tostring(settingsx.profile()))
     print("workspace=" .. tostring(settingsx.workspace()))
+    print("agent=" .. tostring(activeAgent))
+  elseif input:sub(1, 7) == "/agent " then
+    activeAgent = identity.sanitizeId(input:sub(8))
+    identity.ensureAgent(activeAgent)
+    identity.setDefaultAgent(activeAgent)
+    history = {}
+    print("Active agent: " .. activeAgent)
+  elseif input == "/agents" then
+    for _, id in ipairs(identity.listAgents()) do print((id == activeAgent and "* " or "  ") .. id) end
   else
-    local reply, err = chat.ask(history, input)
+    local reply, err = chat.ask(history, input, { agentId = activeAgent })
     if not reply then
       render.error(err)
     else

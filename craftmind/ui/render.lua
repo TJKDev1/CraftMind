@@ -77,7 +77,6 @@ function M.renderAssistant(raw)
     local before = string.sub(raw, pos, s - 1)
     if before ~= "" and before:match("%S") then
       M.assistant((before:gsub("^%s+", ""):gsub("%s+$", "")))
-      shown = true
     end
 
     M.thinking((inner:gsub("^%s+", ""):gsub("%s+$", "")))

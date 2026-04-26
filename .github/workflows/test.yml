@@ -1,0 +1,26 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lua:
+    name: Lua host checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Lua and CraftOS-PC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.2 luarocks flatpak
+          sudo luarocks install luacheck
+          flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y flathub cc.craftos_pc.CraftOS-PC
+
+      - name: Run test suite
+        run: ./scripts/test.sh

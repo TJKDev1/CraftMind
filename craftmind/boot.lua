@@ -8,6 +8,7 @@ settingsx.defineAll()
 
 while true do
   local choice = menu.choose("CraftMind v" .. config.version, {
+    { label = "Agents / Hatch", run = function() shell.run("/craftmind/apps/agents.lua") end },
     { label = "Chat", run = function() shell.run("/craftmind/apps/chat.lua") end },
     { label = "Agent Workspace", run = function() shell.run("/craftmind/apps/agent.lua") end },
     { label = "Setup", run = function() shell.run("/craftmind/apps/setup.lua") end },

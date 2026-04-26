@@ -4,6 +4,18 @@ local M = {}
 
 local curated = {
   {
+    title = "CraftMind OpenClaw-style architecture",
+    text = "CraftMind maps OpenClaw's channel/brain/body architecture to ComputerCraft. Channel means terminal today plus future rednet/turtle/http adapters. Brain means provider-agnostic prompt assembly from AGENTS.md, SOUL.md, USER.md, TOOLS.md, HEARTBEAT.md, MEMORY.md, identity files, docs, skills, and session logs. Body means workspace tools, agent messaging, shell/Lua gated by safety, and ComputerCraft actuators like turtles and rednet.",
+  },
+  {
+    title = "CraftMind identity and hatching",
+    text = "CraftMind agents hatch into workspace identity files under .craftmind/agents/<id> including identity.md, soul.md, tools.md, memory.md, inbox.md, and orchestration.md. Workspace root bootstrap files AGENTS.md, SOUL.md, USER.md, TOOLS.md, HEARTBEAT.md, and MEMORY.md are also injected as durable context. These files are ComputerCraft-focused and may be read or edited through workspace-scoped tools.",
+  },
+  {
+    title = "CraftMind multi-agent orchestration",
+    text = "CraftMind supports one default agent by default and optional multi-agent workspaces. Agents can send messages using craftmind-message blocks; inbox.md records messages. Keep delegation safe, auditable, and ComputerCraft-native.",
+  },
+  {
     title = "ComputerCraft basics",
     text = "ComputerCraft runs Lua programs on computers, turtles, pocket computers, and command computers. Common APIs: shell, fs, term, rednet, peripheral, settings, textutils, http.",
   },
@@ -25,6 +37,43 @@ local curated = {
   },
 }
 
+local function loadMarkdownDir(dir, label)
+  local docs = {}
+  if not fs or not fs.exists or not fs.exists(dir) then return docs end
+  for _, name in ipairs(fs.list(dir)) do
+    if name:sub(-3) == ".md" then
+      local path = fs.combine(dir, name)
+      if not fs.isDir(path) then
+        local f = fs.open(path, "r")
+        if f then
+          local body = f.readAll()
+          f.close()
+          table.insert(docs, { title = label .. ": " .. name, text = body })
+        end
+      end
+    end
+  end
+  return docs
+end
+
+local function loadMarkdownDocs()
+  local docs = {}
+  for _, doc in ipairs(loadMarkdownDir("/craftmind/docs", "CraftMind docs")) do table.insert(docs, doc) end
+  local workspace = settingsx.workspace and settingsx.workspace() or "/craftmind/workspace"
+  local workspaceDocs = fs and fs.combine and fs.combine(workspace, ".craftmind/docs") or nil
+  if workspaceDocs then
+    for _, doc in ipairs(loadMarkdownDir(workspaceDocs, "Workspace CraftMind docs")) do table.insert(docs, doc) end
+  end
+  return docs
+end
+
+local function allDocs()
+  local out = {}
+  for _, doc in ipairs(curated) do table.insert(out, doc) end
+  for _, doc in ipairs(loadMarkdownDocs()) do table.insert(out, doc) end
+  return out
+end
+
 local function score(q, text)
   q = string.lower(q or "")
   text = string.lower(text or "")
@@ -38,7 +87,7 @@ end
 function M.search(query, limit)
   if settingsx.docsMode() == "off" then return {} end
   local hits = {}
-  for _, doc in ipairs(curated) do
+  for _, doc in ipairs(allDocs()) do
     table.insert(hits, { score = score(query, doc.title .. " " .. doc.text), title = doc.title, text = doc.text })
   end
   table.sort(hits, function(a, b) return a.score > b.score end)

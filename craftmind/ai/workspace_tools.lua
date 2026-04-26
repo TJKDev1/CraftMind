@@ -2,6 +2,8 @@ local settingsx = require("craftmind.core.settings")
 local config = require("craftmind.config")
 local fileTool = require("craftmind.tools.file")
 local luaAgent = require("craftmind.ai.lua_agent")
+local orchestrator = require("craftmind.ai.orchestrator")
+local identity = require("craftmind.identity")
 
 local M = {}
 
@@ -132,9 +134,8 @@ end
 
 local function withCapture(fn)
   local start, stop, text = makeCapture()
-  local ok, a, b = nil, nil, nil
   start()
-  ok, a, b = pcall(fn)
+  local ok, a, b = pcall(fn)
   stop()
   if not ok then return false, tostring(a), text() end
   return true, a, text(), b
@@ -145,7 +146,7 @@ function M.canRun()
 end
 
 function M.runShell(command)
-  if not M.canRun() then return false, "agent execution blocked by safety/profile settings" end
+  if not M.canRun() then return false, "shell execution blocked by safety/profile settings" end
   command = trim(command)
   if command == "" then return false, "empty command" end
   local r = ensureWorkspace()
@@ -161,7 +162,7 @@ function M.runShell(command)
 end
 
 function M.runLua(code)
-  if not M.canRun() then return false, "agent execution blocked by safety/profile settings" end
+  if not M.canRun() then return false, "raw Lua execution blocked by safety/profile settings" end
   code = code or ""
   if trim(code) == "" then return false, "empty Lua" end
   local r = ensureWorkspace()
@@ -206,7 +207,10 @@ function M.extract(text)
   for body in string.gmatch(text, "<craftmind%-lua>(.-)</craftmind%-lua>") do
     table.insert(ops, { type = "lua", code = body:gsub("^\n", ""):gsub("\n$", "") })
   end
-
+  for attrText, body in string.gmatch(text, "<craftmind%-message(.-)>(.-)</craftmind%-message>") do
+    local attrs = parseAttrs(attrText)
+    table.insert(ops, { type = "message", to = attrs.to or attrs.agent or attrs.id, from = attrs.from, content = body:gsub("^\n", ""):gsub("\n$", "") })
+  end
   return ops
 end
 
@@ -215,6 +219,7 @@ function M.stripToolBlocks(text)
   text = text:gsub("<craftmind%-file.->.-</craftmind%-file>", "")
   text = text:gsub("<craftmind%-lua>.-</craftmind%-lua>", "")
   text = text:gsub("<craftmind%-exec.->.-</craftmind%-exec>", "")
+  text = text:gsub("<craftmind%-message.->.-</craftmind%-message>", "")
   text = text:gsub("<craftmind%-read.*/>", "")
   text = text:gsub("<craftmind%-list.*/>", "")
   text = text:gsub("<craftmind%-exec.*/>", "")
@@ -244,6 +249,9 @@ function M.run(op)
     return M.runShell(op.command)
   elseif op.type == "lua" then
     return M.runLua(op.code)
+  elseif op.type == "message" then
+    local from = op.from or (identity.defaultAgentId and identity.defaultAgentId()) or "main"
+    return orchestrator.sendMessage(from, op.to, op.content)
   end
   return false, "unknown op: " .. tostring(op.type)
 end

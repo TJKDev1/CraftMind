@@ -11,6 +11,7 @@ local defs = {
   [config.settings.docsMode] = { description = "Docs context mode", default = config.defaults.docsMode, type = "string" },
   [config.settings.workspace] = { description = "CraftMind Agent workspace", default = config.defaults.workspace, type = "string" },
   [config.settings.agentMaxSteps] = { description = "CraftMind Agent max steps", default = config.defaults.agentMaxSteps, type = "number" },
+  [config.settings.defaultAgent] = { description = "Default CraftMind agent id", default = config.defaults.defaultAgent, type = "string" },
   [config.settings.groqKey] = { description = "Groq API key", default = "", type = "string" },
   [config.settings.geminiKey] = { description = "Gemini API key", default = "", type = "string" },
   [config.settings.nvidiaKey] = { description = "NVIDIA API key", default = "", type = "string" },
@@ -34,5 +35,6 @@ function M.rawLuaConfirm() return settings.get(config.settings.rawLuaConfirm) or
 function M.docsMode() return settings.get(config.settings.docsMode) or config.defaults.docsMode end
 function M.workspace() return settings.get(config.settings.workspace) or config.defaults.workspace end
 function M.agentMaxSteps() return settings.get(config.settings.agentMaxSteps) or config.defaults.agentMaxSteps end
+function M.defaultAgent() return settings.get(config.settings.defaultAgent) or config.defaults.defaultAgent end
 
 return M
