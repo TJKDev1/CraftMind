@@ -1,16 +1,28 @@
 # CraftMind
 
-Modular ComputerCraft AI framework for chat, docs-aware help, file creation, OpenClaw-style workspace agent mode, and turtle control.
+CraftMind is a ComputerCraft implementation of the OpenClaw idea: an AI-first workspace agent that can understand ComputerCraft, inspect and edit files, run safe tool loops, and help automate computers and turtles.
+
+The project name stays **CraftMind**. OpenClaw describes the idea, scope, and agent style.
 
 ## Goals
 
+- Make the Agent Workspace the primary OpenClaw-style experience for ComputerCraft
+- Keep the implementation ComputerCraft/CC:Tweaked-native
 - Private-first project structure
 - Multiplayer-safe defaults
-- OpenClaw-style Agent Workspace with autonomous tool loops
+- Autonomous tool loops for list/read/write/shell/Lua operations
 - Power mode for raw Lua/shell execution when explicitly enabled
 - Modular providers: Groq, Gemini, NVIDIA NIM, OpenAI-compatible APIs
 - Curated bundled docs first, optional full ComputerCraft docs later
 - Shared codebase with profiles instead of separate safe/unsafe versions
+
+## AI scope for this codebase
+
+AI contributors and in-app assistants should treat this project as:
+
+> Build CraftMind as an OpenClaw-style agent for ComputerCraft, not a generic chatbot and not a desktop OS agent.
+
+Prioritize ComputerCraft-native agent workflows, turtle/rednet use cases, Lua code generation, terminal UX, and safe workspace automation.
 
 ## Current skeleton
 

@@ -1,4 +1,5 @@
 -- CraftMind public GitHub installer for ComputerCraft
+-- Project idea: OpenClaw-style AI workspace agent for ComputerCraft.
 
 local OWNER = "TJKDev1"
 local REPO = "CraftMind"

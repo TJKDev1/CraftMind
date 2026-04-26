@@ -22,6 +22,7 @@ end
 print("CraftMind Agent v" .. config.version)
 print("Workspace: " .. tools.root())
 print("Provider: " .. settingsx.provider() .. " | Model: " .. tostring(settingsx.model()))
+print("Idea: OpenClaw-style agent workflows for ComputerCraft.")
 print("Type /quit to exit. Agent auto-runs tool blocks.")
 print("Warning: shell/Lua tools have full ComputerCraft permissions.")
 
