@@ -31,6 +31,7 @@ Early rewrite skeleton. Core modules exist, but APIs and UX may change while the
   - OpenAI-compatible endpoints
 - Safe-by-default local and remote controls
 - OpenClaw-style Agent Workspace with autonomous ReAct tool loops
+- Runtime pipeline: `channel → route → context → model → tools → persist`
 - OpenClaw-style bootstrap context (`AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `HEARTBEAT.md`, `MEMORY.md`)
 - Hatchable ComputerCraft agent identity (`soul.md`, `identity.md`, `tools.md`, `memory.md`, `inbox.md`)
 - Persistent terminal session logs under `.craftmind/sessions/`
@@ -152,7 +153,7 @@ Agent file/read/list/message tools stay inside its workspace. Shell and raw Lua 
 ```txt
 craftmind/
   apps/       setup and chat apps
-  ai/         chat, workspace agent, and Lua execution logic
+  ai/         chat, runtime pipeline, workspace agent, and Lua execution logic
   client/     remote client helpers
   core/       settings, HTTP, logging
   docs/       docs manifest/RAG index and agent-visible markdown docs

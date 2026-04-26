@@ -10,14 +10,14 @@ OpenClaw uses three layers:
 2. Brain — agent runtime assembles context, calls a model, runs a ReAct loop, loads skills, and persists state.
 3. Body — tools perform real actions such as file operations, browser automation, messaging, and scheduled jobs.
 
-OpenClaw message flow is commonly described as seven stages: normalize input, route/session serialize, assemble context, model inference, ReAct tool loop, on-demand skill loading, memory/persistence.
+OpenClaw message flow is commonly described as seven stages: normalize input, route/session serialize, assemble context, model inference, ReAct tool loop, on-demand skill loading, memory/persistence. CraftMind's concrete ComputerCraft runtime is `channel → route → context → model → tools → persist` in `craftmind.ai.runtime_pipeline`.
 
 ## CraftMind mapping
 
 | OpenClaw concept | CraftMind / ComputerCraft fit |
 | --- | --- |
 | Channel layer | Terminal prompts now; rednet/turtle/http adapters can normalize events later. |
-| Brain layer | Provider adapters, bootstrap files, identity files, docs manifest, skill list, session JSONL, workspace agent loop. |
+| Brain layer | Runtime pipeline, provider adapters, bootstrap files, identity files, docs manifest, skill list, session JSONL, workspace agent loop. |
 | Body layer | Workspace list/read/write, agent messaging, shell/Lua behind power mode, turtles/rednet as in-game actuators. |
 | Browser automation | Out of scope; ComputerCraft-native turtle, rednet, peripheral, and terminal actions replace it. |
 | Markdown workspace | `/craftmind/workspace` with `AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `HEARTBEAT.md`, `MEMORY.md`. |

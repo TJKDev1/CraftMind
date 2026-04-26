@@ -40,6 +40,7 @@ Prioritize ComputerCraft-native agent workflows, turtle/rednet use cases, Lua co
 - `ai/tool_runner.lua` — confirmed file write/append tool blocks
 - `ai/context.lua` — OpenClaw-style bootstrap/context/skills assembler
 - `ai/session.lua` — ComputerCraft-friendly session JSONL persistence
+- `ai/runtime_pipeline.lua` — runtime stages: channel → route → context → model → tools → persist
 - `ai/workspace_agent.lua` — OpenClaw-style agent prompt loop
 - `ai/workspace_tools.lua` — workspace file/read/list/shell/Lua tools
 - `turtle/server.lua` — Rednet turtle server with discovery/status/inventory/inspect/refuel/gated Lua
