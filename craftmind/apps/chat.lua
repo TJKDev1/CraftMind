@@ -3,6 +3,7 @@ package.path = "/?.lua;/?/init.lua;" .. package.path
 local settingsx = require("craftmind.core.settings")
 local chat = require("craftmind.ai.chat")
 local config = require("craftmind.config")
+local render = require("craftmind.ui.render")
 
 settingsx.defineAll()
 
@@ -24,9 +25,9 @@ while true do
   else
     local reply, err = chat.ask(history, input)
     if not reply then
-      print("Error: " .. tostring(err))
+      render.error(err)
     else
-      print("\nCraftMind> " .. reply)
+      render.renderAssistant(reply)
       table.insert(history, { role = "user", content = input })
       table.insert(history, { role = "assistant", content = reply })
       while #history > 12 do table.remove(history, 1) end

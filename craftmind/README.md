@@ -16,6 +16,7 @@ Modular ComputerCraft AI framework for chat, docs-aware help, file creation, and
 - `boot.lua` — main menu
 - `apps/setup.lua` — provider/model/safety setup wizard
 - `apps/chat.lua` — docs-aware chat client
+- `ui/render.lua` — colored terminal rendering for replies and thinking blocks
 - `providers/` — provider abstraction
 - `ai/lua_agent.lua` — raw Lua preview/confirm executor
 - `turtle/server.lua` — Rednet turtle server skeleton

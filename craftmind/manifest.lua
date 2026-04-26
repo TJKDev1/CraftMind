@@ -18,6 +18,7 @@ return {
     "docs/index.lua",
     "tools/file.lua",
     "ui/menu.lua",
+    "ui/render.lua",
     "apps/setup.lua",
     "apps/chat.lua",
     "turtle/server.lua",
