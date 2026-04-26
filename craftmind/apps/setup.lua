@@ -1,3 +1,5 @@
+package.path = "/?.lua;/?/init.lua;" .. package.path
+
 local config = require("craftmind.config")
 local settingsx = require("craftmind.core.settings")
 local menu = require("craftmind.ui.menu")

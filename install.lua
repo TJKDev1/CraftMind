@@ -70,7 +70,7 @@ local function install()
   end
   print("")
   print("Install complete.")
-  print("Run: craftmind/boot.lua")
+  print("Run: /craftmind/boot.lua")
 end
 
 install()

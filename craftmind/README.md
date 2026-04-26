@@ -36,7 +36,7 @@ wget run https://raw.githubusercontent.com/TJKDev1/CraftMind/refs/heads/main/ins
 After install:
 
 ```lua
-craftmind/boot.lua
+/craftmind/boot.lua
 ```
 
 Or:

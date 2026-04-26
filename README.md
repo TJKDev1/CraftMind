@@ -33,7 +33,7 @@ If your repository name is different, edit `OWNER`, `REPO`, and `BRANCH` at top 
 ## Run
 
 ```lua
-craftmind/boot.lua
+/craftmind/boot.lua
 ```
 
 Or run setup/chat directly:

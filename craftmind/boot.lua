@@ -1,3 +1,5 @@
+package.path = "/?.lua;/?/init.lua;" .. package.path
+
 local settingsx = require("craftmind.core.settings")
 local menu = require("craftmind.ui.menu")
 local config = require("craftmind.config")
@@ -6,9 +8,9 @@ settingsx.defineAll()
 
 while true do
   local choice = menu.choose("CraftMind v" .. config.version, {
-    { label = "Chat", run = function() shell.run("craftmind/apps/chat.lua") end },
-    { label = "Setup", run = function() shell.run("craftmind/apps/setup.lua") end },
-    { label = "Turtle Server", run = function() shell.run("craftmind/turtle/server.lua") end },
+    { label = "Chat", run = function() shell.run("/craftmind/apps/chat.lua") end },
+    { label = "Setup", run = function() shell.run("/craftmind/apps/setup.lua") end },
+    { label = "Turtle Server", run = function() shell.run("/craftmind/turtle/server.lua") end },
     { label = "Exit", run = function() return "exit" end },
   })
   if not choice then break end
