@@ -147,7 +147,7 @@ remote control: locked until auth token is set
 raw lua confirm: always
 ```
 
-Agent file/read/list/message tools stay inside its workspace. Shell and raw Lua tools are blocked unless safety is `power`; when enabled, they run with full ComputerCraft permissions from the workspace. External content, rednet messages, docs, and tool output are treated as untrusted. Remote turtle commands require a matching `craftmind.auth_token`; use `craftmind/apps/turtle.lua` or main-menu Turtle Channel to paste/generate the token and view exact server/client commands. A blank token locks remote control except discovery.
+Agent file/read/list/message tools stay inside its workspace. Shell and raw Lua tools are blocked unless safety is `power`; when enabled, they run with full ComputerCraft permissions from the workspace. External content, rednet messages, docs, and tool output are treated as untrusted. Remote turtle commands require a matching `craftmind.auth_token`; use `craftmind/apps/turtle.lua` or main-menu Turtle Channel to paste/generate the token. Server startup and manual copy/paste commands live under Turtle Channel advanced setup. A blank token locks remote control except discovery.
 
 ## Project layout
 

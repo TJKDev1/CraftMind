@@ -146,7 +146,7 @@ Agent gets dedicated workspace (`/craftmind/workspace` by default). It can list/
 
 Default mode is safe. Raw Lua and shell execution are blocked unless safety is `power`. Workspace file/list/read/message tools remain workspace-scoped. Preview + confirmation is enabled by default for chat raw-Lua flows.
 
-Remote turtle commands require a matching `craftmind.auth_token` on the server. Use `craftmind/apps/turtle.lua` or the main-menu Turtle Channel to paste/generate the token and show exact server/client commands. A blank token locks remote control except discovery. The Remote Turtles app can discover servers, query status/inventory, inspect blocks, select/refuel slots, and request raw Lua; server-side safety gates still apply.
+Remote turtle commands require a matching `craftmind.auth_token` on the server. Use `craftmind/apps/turtle.lua` or the main-menu Turtle Channel to paste/generate the token; server startup and manual copy/paste commands live under Turtle Channel advanced setup. A blank token locks remote control except discovery. The Remote Turtles app can discover servers, query status/inventory, inspect blocks, select/refuel slots, and request raw Lua; server-side safety gates still apply.
 
 ## Provider notes
 

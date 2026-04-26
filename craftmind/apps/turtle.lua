@@ -55,7 +55,6 @@ local function setAuthToken()
       { label = "Paste / edit token", value = "paste" },
       { label = "Generate token and save here", value = "generate" },
       { label = "Clear token (lock remote commands)", value = "clear" },
-      { label = "Show server/client commands", value = "commands" },
       { label = "Back", value = "back" },
     })
     if not item or item.value == "back" then return end
@@ -68,21 +67,11 @@ local function setAuthToken()
       term.clear()
       term.setCursorPos(1, 1)
       print("Generated token saved on this computer.")
-      print("")
-      showCommands(token)
+      print("Next: put same token on turtle server.")
+      print("Advanced -> Manual server/client commands shows copy/paste commands.")
       menu.pause()
     elseif item.value == "clear" then
       settingsx.set(config.settings.authToken, "")
-    elseif item.value == "commands" then
-      term.clear()
-      term.setCursorPos(1, 1)
-      local token = settingsx.authToken() or ""
-      if token == "" then
-        print("No token set. Generate or paste token first.")
-      else
-        showCommands(token)
-      end
-      menu.pause()
     end
   end
 end
@@ -127,17 +116,42 @@ local function remoteConsole()
   shell.run("/craftmind/apps/remote.lua")
 end
 
+local function manualCommands()
+  term.clear()
+  term.setCursorPos(1, 1)
+  local token = settingsx.authToken() or ""
+  if token == "" then
+    print("No token set. Generate or paste token first.")
+  else
+    showCommands(token)
+  end
+  menu.pause()
+end
+
+local function advancedMenu()
+  while true do
+    local choice = menu.choose("Turtle Channel Advanced", {
+      { label = "Start turtle server on this computer", run = startServer },
+      { label = "Set turtle server name", run = serverName },
+      { label = "Manual server/client commands", run = manualCommands },
+      { label = "Run advanced onboarding", run = function() shell.run("/craftmind/apps/setup.lua --advanced") end },
+      { label = "Back", run = function() return "back" end },
+    })
+    if not choice then return end
+    local result = choice.run()
+    if result == "back" then return end
+  end
+end
+
 while true do
   local auth = settingsx.authToken() or ""
   local modem = hasModem()
   local title = "CraftMind Turtle Channel v" .. config.version .. " [auth=" .. (auth == "" and "missing" or "set") .. ", modem=" .. tostring(modem or "missing") .. "]"
   local choice = menu.choose(title, {
-    { label = "Channel status / next steps", run = status },
     { label = "Set / generate auth token", run = setAuthToken },
-    { label = "Set turtle server name", run = serverName },
-    { label = "Start turtle server on this computer", run = startServer },
     { label = "Discover / control remote turtles", run = remoteConsole },
-    { label = "Onboarding / setup", run = function() shell.run("/craftmind/apps/setup.lua --advanced") end },
+    { label = "Channel status / next steps", run = status },
+    { label = "Advanced server/manual setup", run = advancedMenu },
     { label = "Exit", run = function() return "exit" end },
   })
   if not choice then break end
