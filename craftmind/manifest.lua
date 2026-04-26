@@ -1,6 +1,6 @@
 return {
   name = "CraftMind",
-  version = "0.1.1",
+  version = "0.2.0",
   files = {
     "README.md",
     "config.lua",
@@ -16,12 +16,15 @@ return {
     "ai/chat.lua",
     "ai/lua_agent.lua",
     "ai/tool_runner.lua",
+    "ai/workspace_agent.lua",
+    "ai/workspace_tools.lua",
     "docs/index.lua",
     "tools/file.lua",
     "ui/menu.lua",
     "ui/render.lua",
     "apps/setup.lua",
     "apps/chat.lua",
+    "apps/agent.lua",
     "turtle/server.lua",
     "client/remote.lua",
   },

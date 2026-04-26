@@ -15,7 +15,7 @@ end
 local function safePath(path)
   path = trim(path)
   if path == "" then return nil, "empty path" end
-  if path:find("%.%.", 1, true) then return nil, "parent paths not allowed" end
+  if path:find("..", 1, true) then return nil, "parent paths not allowed" end
   if path:sub(1, 1) ~= "/" then path = "/" .. path end
   return path
 end

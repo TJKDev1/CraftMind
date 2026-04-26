@@ -23,6 +23,7 @@ while true do
     print("model=" .. tostring(settingsx.model()))
     print("safety=" .. tostring(settingsx.safety()))
     print("profile=" .. tostring(settingsx.profile()))
+    print("workspace=" .. tostring(settingsx.workspace()))
   else
     local reply, err = chat.ask(history, input)
     if not reply then

@@ -43,4 +43,17 @@ local profile = menu.choose("Profile", {
 })
 if profile then settingsx.set(config.settings.profile, profile.value) end
 
+local rawConfirm = menu.choose("Raw Lua confirmation", {
+  { label = "Always confirm raw Lua previews", value = "always" },
+  { label = "Optional", value = "optional" },
+  { label = "Off", value = "off" },
+})
+if rawConfirm then settingsx.set(config.settings.rawLuaConfirm, rawConfirm.value) end
+
+local workspace = menu.prompt("Agent workspace", settingsx.get(config.settings.workspace) or config.defaults.workspace)
+settingsx.set(config.settings.workspace, workspace)
+
+local maxSteps = tonumber(menu.prompt("Agent max steps", tostring(settingsx.get(config.settings.agentMaxSteps) or config.defaults.agentMaxSteps))) or config.defaults.agentMaxSteps
+settingsx.set(config.settings.agentMaxSteps, maxSteps)
+
 print("Setup complete.")

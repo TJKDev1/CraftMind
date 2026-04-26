@@ -4,7 +4,8 @@ local OWNER = "TJKDev1"
 local REPO = "CraftMind"
 local BRANCH = "main"
 local BASE_DIR = "craftmind"
-local REMOTE_VERSION = "0.1.1"
+local REMOTE_VERSION = "0.2.0"
+local CACHE_BUST = tostring((os.epoch and os.epoch("utc")) or os.time())
 
 local files = {
   "README.md",
@@ -22,12 +23,15 @@ local files = {
   "ai/chat.lua",
   "ai/lua_agent.lua",
   "ai/tool_runner.lua",
+  "ai/workspace_agent.lua",
+  "ai/workspace_tools.lua",
   "docs/index.lua",
   "tools/file.lua",
   "ui/menu.lua",
   "ui/render.lua",
   "apps/setup.lua",
   "apps/chat.lua",
+  "apps/agent.lua",
   "turtle/server.lua",
   "client/remote.lua",
 }
@@ -64,7 +68,7 @@ local function currentVersion()
 end
 
 local function rawUrl(path)
-  return "https://raw.githubusercontent.com/" .. OWNER .. "/" .. REPO .. "/" .. BRANCH .. "/" .. BASE_DIR .. "/" .. path
+  return "https://raw.githubusercontent.com/" .. OWNER .. "/" .. REPO .. "/" .. BRANCH .. "/" .. BASE_DIR .. "/" .. path .. "?bust=" .. CACHE_BUST
 end
 
 local function download(path)

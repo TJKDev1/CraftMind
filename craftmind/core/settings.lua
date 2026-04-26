@@ -9,6 +9,8 @@ local defs = {
   [config.settings.profile] = { description = "CraftMind permission profile", default = config.defaults.profile, type = "string" },
   [config.settings.rawLuaConfirm] = { description = "Raw Lua confirmation mode", default = config.defaults.rawLuaConfirm, type = "string" },
   [config.settings.docsMode] = { description = "Docs context mode", default = config.defaults.docsMode, type = "string" },
+  [config.settings.workspace] = { description = "CraftMind Agent workspace", default = config.defaults.workspace, type = "string" },
+  [config.settings.agentMaxSteps] = { description = "CraftMind Agent max steps", default = config.defaults.agentMaxSteps, type = "number" },
   [config.settings.groqKey] = { description = "Groq API key", default = "", type = "string" },
   [config.settings.geminiKey] = { description = "Gemini API key", default = "", type = "string" },
   [config.settings.nvidiaKey] = { description = "NVIDIA API key", default = "", type = "string" },
@@ -30,5 +32,7 @@ function M.safety() return settings.get(config.settings.safety) or config.defaul
 function M.profile() return settings.get(config.settings.profile) or config.defaults.profile end
 function M.rawLuaConfirm() return settings.get(config.settings.rawLuaConfirm) or config.defaults.rawLuaConfirm end
 function M.docsMode() return settings.get(config.settings.docsMode) or config.defaults.docsMode end
+function M.workspace() return settings.get(config.settings.workspace) or config.defaults.workspace end
+function M.agentMaxSteps() return settings.get(config.settings.agentMaxSteps) or config.defaults.agentMaxSteps end
 
 return M

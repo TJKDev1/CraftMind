@@ -1,6 +1,6 @@
 local config = {
   name = "CraftMind",
-  version = "0.1.1",
+  version = "0.2.0",
 
   defaults = {
     provider = "groq",
@@ -8,6 +8,8 @@ local config = {
     rawLuaConfirm = "always", -- always | optional | off
     profile = "multiplayer", -- multiplayer | singleplayer | admin
     docsMode = "curated", -- curated | full | off
+    workspace = "/craftmind/workspace",
+    agentMaxSteps = 8,
   },
 
   settings = {
@@ -17,6 +19,8 @@ local config = {
     profile = "craftmind.profile",
     rawLuaConfirm = "craftmind.raw_lua_confirm",
     docsMode = "craftmind.docs_mode",
+    workspace = "craftmind.workspace",
+    agentMaxSteps = "craftmind.agent_max_steps",
 
     groqKey = "craftmind.api_key.groq",
     geminiKey = "craftmind.api_key.gemini",
