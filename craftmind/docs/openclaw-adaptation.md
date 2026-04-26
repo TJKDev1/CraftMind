@@ -24,6 +24,21 @@ OpenClaw message flow is commonly described as seven stages: normalize input, ro
 | Sessions | `.craftmind/sessions/*.jsonl`, recent turns loaded into Agent Workspace. |
 | Skills | `skills/<skill>/SKILL.md` or `.craftmind/skills/<skill>/SKILL.md`; compact list injected, full file read on demand. |
 
+## Onboarding adaptation
+
+OpenClaw onboarding configures gateway, workspace, model/provider, channels, skills, and first-run agent bootstrapping. CraftMind mirrors that flow in ComputerCraft-native modules:
+
+1. Security acknowledgement.
+2. Provider/model/API key setup.
+3. Workspace bootstrap file seeding.
+4. Safety profile selection.
+5. User profile capture into `USER.md`.
+6. Agent hatching into `.craftmind/agents/<id>/`.
+7. Optional gateway/channel setup for rednet/turtle server notes.
+8. Optional skill template seeding.
+
+The implementation is modular: `craftmind.onboarding` owns a step registry. Steps declare `id`, `title`, `order`, `modes`, optional `when(state)`, and `run(state)`. QuickStart, Advanced, Repair, and non-interactive modes select subsets of these steps. New onboarding features should be added as new steps instead of editing one long setup script.
+
 ## Safety deltas
 
 ComputerCraft has no OS sandbox. CraftMind keeps file tools workspace-scoped and gates shell/raw Lua behind `safety=power` or `profile=admin`. External text from docs, rednet, files, and tool output is treated as untrusted and must not override operating rules.

@@ -22,6 +22,7 @@ return {
     "ai/workspace_tools.lua",
     "ai/orchestrator.lua",
     "identity/init.lua",
+    "onboarding/init.lua",
     "docs/index.lua",
     "docs/craftmind.md",
     "docs/agents.md",

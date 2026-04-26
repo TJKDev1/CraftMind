@@ -30,5 +30,19 @@ assert(#ops == 1 and ops[1].type == "list", "tool extract failed")
 local ok, result = tools.run(ops[1])
 assert(ok, "tool list failed: " .. tostring(result))
 
+local onboarding = require("craftmind.onboarding")
+local onboardOk, onboardState = onboarding.run({
+  "--non-interactive",
+  "--accept-risk",
+  "--provider=groq",
+  "--workspace=/workspace",
+  "--agent-id=onboard-smoke",
+  "--agent-name=Onboard Smoke",
+  "--seed-skills=true",
+})
+assert(onboardOk, "onboarding failed: " .. tostring(onboardState))
+assert(settingsx.onboardingCompleted(), "onboarding completion flag missing")
+assert(fs.exists(fs.combine(tools.root(), ".craftmind/agents/onboard-smoke/identity.md")), "onboarded agent missing")
+assert(fs.exists(fs.combine(tools.root(), ".craftmind/skills/turtle-safety/SKILL.md")), "seeded skill missing")
 
 print("CraftMind ComputerCraft smoke OK")

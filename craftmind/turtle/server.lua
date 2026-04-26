@@ -7,8 +7,8 @@ local logger = require("craftmind.core.logger")
 settingsx.defineAll()
 
 local PROTOCOL = "craftmind.v1"
-local SERVER_NAME = settings.get("craftmind.server_name") or "CraftMind Turtle"
-local AUTH_TOKEN = settings.get("craftmind.auth_token") or ""
+local SERVER_NAME = settingsx.serverName()
+local AUTH_TOKEN = settingsx.authToken()
 
 local function openAnyModem()
   for _, side in ipairs(peripheral.getNames()) do

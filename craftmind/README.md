@@ -32,7 +32,7 @@ Prioritize ComputerCraft-native agent workflows, turtle/rednet use cases, Lua co
 ## Current skeleton
 
 - `boot.lua` — main menu
-- `apps/setup.lua` — provider/model/safety setup wizard
+- `apps/setup.lua` — OpenClaw-style onboarding entrypoint
 - `apps/chat.lua` — docs-aware chat client
 - `ui/render.lua` — colored terminal rendering for replies and thinking blocks
 - `providers/` — provider abstraction
@@ -47,6 +47,7 @@ Prioritize ComputerCraft-native agent workflows, turtle/rednet use cases, Lua co
 - `docs/index.lua` — curated local docs search plus markdown docs loader
 - `docs/*.md` — CraftMind documentation visible to agents
 - `identity/init.lua` — hatching, identity context, memory/inbox helpers
+- `onboarding/init.lua` — modular QuickStart/Advanced/Repair/non-interactive setup steps
 - `ai/orchestrator.lua` — agent-to-agent message/reply helper
 - `tools/file.lua` — file read/write helper
 
@@ -73,6 +74,19 @@ craftmind/apps/setup.lua
 craftmind/apps/chat.lua
 craftmind/apps/agent.lua
 ```
+
+## Onboarding
+
+First boot offers OpenClaw-style onboarding. Direct modes:
+
+```lua
+craftmind/apps/setup.lua --quickstart
+craftmind/apps/setup.lua --advanced
+craftmind/apps/setup.lua --repair
+craftmind/apps/setup.lua --non-interactive --accept-risk --provider=groq --workspace=/craftmind/workspace --agent-id=main
+```
+
+QuickStart configures provider/model, workspace, safe defaults, user profile, and agent. Advanced adds raw Lua confirmation, docs mode, max agent steps, rednet/turtle gateway notes, and optional skill seeding. New setup features should register a new step in `craftmind.onboarding`.
 
 ## Hatching and agent identity
 

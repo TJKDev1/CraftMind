@@ -13,6 +13,10 @@ local config = {
     workspace = "/craftmind/workspace",
     agentMaxSteps = 8,
     defaultAgent = "main",
+    onboardingCompleted = false,
+    rednetGatewayEnabled = false,
+    serverName = "CraftMind Turtle",
+    authToken = "",
   },
 
   settings = {
@@ -25,6 +29,10 @@ local config = {
     workspace = "craftmind.workspace",
     agentMaxSteps = "craftmind.agent_max_steps",
     defaultAgent = "craftmind.default_agent",
+    onboardingCompleted = "craftmind.onboarding.completed",
+    rednetGatewayEnabled = "craftmind.rednet_gateway.enabled",
+    serverName = "craftmind.server_name",
+    authToken = "craftmind.auth_token",
 
     groqKey = "craftmind.api_key.groq",
     geminiKey = "craftmind.api_key.gemini",

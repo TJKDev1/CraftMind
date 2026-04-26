@@ -12,6 +12,10 @@ local defs = {
   [config.settings.workspace] = { description = "CraftMind Agent workspace", default = config.defaults.workspace, type = "string" },
   [config.settings.agentMaxSteps] = { description = "CraftMind Agent max steps", default = config.defaults.agentMaxSteps, type = "number" },
   [config.settings.defaultAgent] = { description = "Default CraftMind agent id", default = config.defaults.defaultAgent, type = "string" },
+  [config.settings.onboardingCompleted] = { description = "CraftMind onboarding completed", default = config.defaults.onboardingCompleted, type = "boolean" },
+  [config.settings.rednetGatewayEnabled] = { description = "CraftMind rednet gateway enabled", default = config.defaults.rednetGatewayEnabled, type = "boolean" },
+  [config.settings.serverName] = { description = "CraftMind turtle server name", default = config.defaults.serverName, type = "string" },
+  [config.settings.authToken] = { description = "CraftMind rednet auth token", default = config.defaults.authToken, type = "string" },
   [config.settings.groqKey] = { description = "Groq API key", default = "", type = "string" },
   [config.settings.geminiKey] = { description = "Gemini API key", default = "", type = "string" },
   [config.settings.nvidiaKey] = { description = "NVIDIA API key", default = "", type = "string" },
@@ -36,5 +40,9 @@ function M.docsMode() return settings.get(config.settings.docsMode) or config.de
 function M.workspace() return settings.get(config.settings.workspace) or config.defaults.workspace end
 function M.agentMaxSteps() return settings.get(config.settings.agentMaxSteps) or config.defaults.agentMaxSteps end
 function M.defaultAgent() return settings.get(config.settings.defaultAgent) or config.defaults.defaultAgent end
+function M.onboardingCompleted() return settings.get(config.settings.onboardingCompleted) or config.defaults.onboardingCompleted end
+function M.rednetGatewayEnabled() return settings.get(config.settings.rednetGatewayEnabled) or config.defaults.rednetGatewayEnabled end
+function M.serverName() return settings.get(config.settings.serverName) or config.defaults.serverName end
+function M.authToken() return settings.get(config.settings.authToken) or config.defaults.authToken end
 
 return M

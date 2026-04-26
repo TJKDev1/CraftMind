@@ -59,7 +59,7 @@ Installer detects fresh install, update, reinstall, and repair by reading `/craf
 /craftmind/boot.lua
 ```
 
-Or run setup/chat/agent directly:
+Or run onboarding/setup/chat/agent directly:
 
 ```lua
 craftmind/apps/setup.lua
@@ -67,6 +67,29 @@ craftmind/apps/chat.lua
 craftmind/apps/agent.lua
 craftmind/apps/agents.lua
 ```
+
+## Onboarding
+
+CraftMind setup now follows the OpenClaw onboarding pattern, adapted to ComputerCraft:
+
+1. Security warning and explicit acknowledgement.
+2. Model provider and credentials.
+3. Workspace selection and bootstrap file seeding.
+4. Safety/profile defaults.
+5. User profile written to `USER.md`.
+6. Agent hatching into `.craftmind/agents/<id>/`.
+7. Optional advanced modules for docs mode, max steps, rednet/turtle gateway notes, and skill seeding.
+
+Modes:
+
+```lua
+craftmind/apps/setup.lua --quickstart
+craftmind/apps/setup.lua --advanced
+craftmind/apps/setup.lua --repair
+craftmind/apps/setup.lua --non-interactive --accept-risk --provider=groq --workspace=/craftmind/workspace --agent-id=main
+```
+
+Onboarding is modular in `craftmind/onboarding/init.lua`: each feature is a registered step with `id`, `title`, `modes`, `order`, and `run(state)`, so new setup features can be added without rewriting the whole flow.
 
 ## Hatching agents
 

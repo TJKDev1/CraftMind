@@ -12,6 +12,17 @@ The product name, package namespace, install path, settings, and XML tools stay 
 - Prefer small, inspectable steps over hidden automation.
 - Default to one agent. Multi-agent orchestration is optional.
 
+## Onboarding
+
+Run `craftmind/apps/setup.lua` or choose **Onboarding / Setup** from boot. The flow mirrors OpenClaw but stays ComputerCraft-native:
+
+- QuickStart configures provider/model, workspace, safe defaults, user profile, and default agent.
+- Advanced adds raw Lua confirmation, docs mode, max agent steps, rednet/turtle gateway notes, and skill seeding.
+- Repair re-seeds workspace bootstrap and agent files.
+- Non-interactive mode supports flags such as `--non-interactive --accept-risk --provider=groq --workspace=/craftmind/workspace --agent-id=main`.
+
+Onboarding features are registered as modular steps in `craftmind.onboarding`, making future setup features easy to add.
+
 ## Workspace
 
 The default workspace is `/craftmind/workspace`. CraftMind creates OpenClaw-style bootstrap files at workspace root:
