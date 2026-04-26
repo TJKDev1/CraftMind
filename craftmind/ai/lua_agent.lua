@@ -16,11 +16,7 @@ function M.preview(code)
 end
 
 function M.canRunRawLua()
-  local safety = settingsx.safety()
-  local profile = settingsx.profile()
-  if safety == "power" then return true end
-  if profile == "admin" then return true end
-  return false
+  return settingsx.safety() == "power"
 end
 
 function M.run(code, opts)
@@ -28,7 +24,7 @@ function M.run(code, opts)
   if not code or code == "" then return false, "empty code" end
 
   if not M.canRunRawLua() then
-    return false, "raw Lua blocked by safety/profile settings"
+    return false, "raw Lua blocked by safety setting"
   end
 
   M.preview(code)

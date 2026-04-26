@@ -17,12 +17,12 @@ OpenClaw message flow is commonly described as seven stages: normalize input, ro
 | OpenClaw concept | CraftMind / ComputerCraft fit |
 | --- | --- |
 | Channel layer | Terminal prompts now; rednet/turtle/http adapters can normalize events later. |
-| Brain layer | Provider adapters, bootstrap files, identity files, docs context, skill list, session JSONL, workspace agent loop. |
-| Body layer | Workspace list/read/write, agent messaging, shell/Lua behind power/admin, turtles/rednet as in-game actuators. |
+| Brain layer | Provider adapters, bootstrap files, identity files, docs manifest, skill list, session JSONL, workspace agent loop. |
+| Body layer | Workspace list/read/write, agent messaging, shell/Lua behind power mode, turtles/rednet as in-game actuators. |
 | Browser automation | Out of scope; ComputerCraft-native turtle, rednet, peripheral, and terminal actions replace it. |
 | Markdown workspace | `/craftmind/workspace` with `AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `HEARTBEAT.md`, `MEMORY.md`. |
 | Sessions | `.craftmind/sessions/*.jsonl`, recent turns loaded into Agent Workspace. |
-| Skills | `skills/<skill>/SKILL.md` or `.craftmind/skills/<skill>/SKILL.md`; compact list injected, full file read on demand. |
+| Skills/docs | `skills/<skill>/SKILL.md` or `.craftmind/skills/<skill>/SKILL.md`; `.craftmind/docs/*.md`; compact manifests injected, full files read on demand. |
 
 ## Onboarding adaptation
 
@@ -31,7 +31,7 @@ OpenClaw onboarding configures gateway, workspace, model/provider, channels, ski
 1. Security acknowledgement.
 2. Provider/model/API key setup.
 3. Workspace bootstrap file seeding.
-4. Safety profile selection.
+4. Execution safety selection.
 5. User profile capture into `USER.md`.
 6. Agent hatching into `.craftmind/agents/<id>/`.
 7. Optional gateway/channel setup for rednet/turtle server notes.
@@ -41,4 +41,4 @@ The implementation is modular: `craftmind.onboarding` owns a step registry. Step
 
 ## Safety deltas
 
-ComputerCraft has no OS sandbox. CraftMind keeps file tools workspace-scoped and gates shell/raw Lua behind `safety=power` or `profile=admin`. External text from docs, rednet, files, and tool output is treated as untrusted and must not override operating rules.
+ComputerCraft has no OS sandbox. CraftMind keeps file tools workspace-scoped and gates shell/raw Lua behind `safety=power`. Remote turtle commands require the configured `craftmind.auth_token`; a blank token locks remote control except discovery. External text from docs, rednet, files, and tool output is treated as untrusted and must not override operating rules.

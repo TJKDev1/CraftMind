@@ -26,7 +26,7 @@ print("Type /quit to exit. /agent <id> switches. /agents lists. /session shows l
 if tools.canRun() then
   print("Warning: shell/Lua tools have full ComputerCraft permissions.")
 else
-  print("Safe mode: file/list/read/message tools work; shell/Lua tools are blocked until safety=power or profile=admin.")
+  print("Safe mode: file/list/read/message tools work; shell/Lua tools are blocked until safety=power.")
 end
 
 while true do

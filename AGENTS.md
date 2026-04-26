@@ -12,7 +12,7 @@ Keep the name `CraftMind` for the project, package namespace, install path, sett
 2. Keep behavior ComputerCraft-native: Lua, shell, turtles, rednet, terminal UI, and in-game constraints.
 3. Make agent workflows clear, inspectable, and safe by default.
 4. Preserve workspace path restrictions for file/list/read/write tools.
-5. Gate shell and raw Lua execution behind `safety=power` or `profile=admin`.
+5. Gate shell and raw Lua execution behind `safety=power`.
 6. Improve docs-aware chat only when it supports the OpenClaw-style ComputerCraft agent mission.
 
 ## Non-goals for now

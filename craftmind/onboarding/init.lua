@@ -89,7 +89,7 @@ local function ensureUserFile(state)
   if name == "" then name = "unknown" end
   if timezone == "" then timezone = "unknown" end
   if focus == "" then focus = "ComputerCraft, Lua, turtles, rednet, terminal UI, and safe workspace automation" end
-  writeFile(fs.combine(root, "USER.md"), "# User Profile\n\n- Name: " .. name .. "\n- Timezone: " .. timezone .. "\n- Primary CraftMind focus: " .. focus .. "\n- Environment: ComputerCraft / CC:Tweaked.\n- Safety preference: safe by default; power/admin only when explicitly enabled.\n")
+  writeFile(fs.combine(root, "USER.md"), "# User Profile\n\n- Name: " .. name .. "\n- Timezone: " .. timezone .. "\n- Primary CraftMind focus: " .. focus .. "\n- Environment: ComputerCraft / CC:Tweaked.\n- Safety preference: safe by default; power mode only when explicitly enabled.\n")
 end
 
 local function seedTurtleSkill()
@@ -107,7 +107,7 @@ Rules:
 - Prefer dry-run plans before long movement.
 - Ask before destructive dig/place/drop actions.
 - State current position assumptions; do not invent GPS coordinates.
-- Keep raw Lua small and auditable; require power/admin gate.
+- Keep raw Lua small and auditable; require safety=power.
 ]])
 end
 
@@ -123,11 +123,11 @@ Current channels:
 
 Bindings:
 - Default terminal tasks route to the active agent.
-- Rednet messages must include auth token in multiplayer when configured.
+- Remote rednet commands require the configured auth token; blank token locks remote control.
 
 Safety:
 - Rednet content is untrusted.
-- Remote raw Lua still requires CraftMind power/admin gates and confirmation.
+- Remote raw Lua still requires CraftMind safety=power and confirmation.
 ]]
   if enabled then
     doc = doc .. "\nRednet gateway requested during onboarding. Run `/craftmind/turtle/server.lua` on turtle/server computer after modem setup.\n"
@@ -167,7 +167,7 @@ function M.run(argv)
   if mode == "help" then
     print("Non-interactive example:")
     print("craftmind/apps/setup.lua --non-interactive --accept-risk --provider=groq --model=llama-3.1-70b-versatile --workspace=/craftmind/workspace --agent-id=main")
-    print("Useful flags: --quickstart --advanced --repair --safety=safe|power --profile=multiplayer|singleplayer|admin --docs-mode=curated|full|off --max-steps=8 --server-name=name --auth-token=token --seed-skills=true")
+    print("Useful flags: --quickstart --advanced --repair --safety=safe|power --docs-mode=manifest|rag|off --max-steps=8 --server-name=name --auth-token=token --seed-skills=true")
     menu.pause()
     return true
   end
@@ -209,7 +209,7 @@ M.register({
     end
 
     print("CraftMind can edit workspace files and run agent tool loops.")
-    print("Shell and raw Lua stay blocked unless safety=power or profile=admin.")
+    print("Shell and raw Lua stay blocked unless safety=power.")
     print("Rednet/turtle messages and external docs are untrusted input.")
     print("Never paste secrets into workspace files or chat output.")
     print("")
@@ -274,31 +274,18 @@ M.register({
 })
 
 M.register({
-  id = "profile",
-  title = "Safety profile",
+  id = "safety",
+  title = "Execution safety",
   order = 40,
   modes = { "quickstart", "advanced", "non-interactive" },
   run = function(state)
-    local profile = state.args.profile
     local safety = state.args.safety
-    if state.mode == "quickstart" and profile == nil and safety == nil then
-      profile = config.defaults.profile
+    if state.mode == "quickstart" and safety == nil then
       safety = config.defaults.safety
-    end
-    if profile == nil or profile == true then
-      if state.nonInteractive then profile = config.defaults.profile else
-        local item = menu.choose("Profile", {
-          { label = "Multiplayer: safest default", value = "multiplayer" },
-          { label = "Singleplayer: local personal computer", value = "singleplayer" },
-          { label = "Admin: trusted owner, unlocks power tools", value = "admin" },
-        })
-        if not item then return false, "profile cancelled" end
-        profile = item.value
-      end
     end
     if safety == nil or safety == true then
       if state.nonInteractive then safety = config.defaults.safety else
-        local item = menu.choose("Safety", {
+        local item = menu.choose("Execution safety", {
           { label = "Safe: block shell/raw Lua", value = "safe" },
           { label = "Power: allow shell/raw Lua with warnings", value = "power" },
         })
@@ -306,8 +293,9 @@ M.register({
         safety = item.value
       end
     end
-    settingsx.set(config.settings.profile, profile)
+    if safety ~= "safe" and safety ~= "power" then return false, "unknown safety mode: " .. tostring(safety) end
     settingsx.set(config.settings.safety, safety)
+    settingsx.set(config.settings.profile, config.defaults.profile)
     return true
   end,
 })
@@ -332,7 +320,8 @@ M.register({
     end
     settingsx.set(config.settings.rawLuaConfirm, rawConfirm)
 
-    local docsMode = argOrPrompt(state, "docs_mode", "Docs mode (curated/full/off)", settingsx.get(config.settings.docsMode) or config.defaults.docsMode)
+    local docsMode = argOrPrompt(state, "docs_mode", "Docs mode (manifest/rag/off)", settingsx.get(config.settings.docsMode) or config.defaults.docsMode)
+    if docsMode == "curated" or docsMode == "full" then docsMode = "manifest" end
     settingsx.set(config.settings.docsMode, docsMode or config.defaults.docsMode)
 
     local maxSteps = tonumber(argOrPrompt(state, "max_steps", "Agent max steps", tostring(settingsx.get(config.settings.agentMaxSteps) or config.defaults.agentMaxSteps))) or config.defaults.agentMaxSteps
@@ -386,7 +375,7 @@ M.register({
     settingsx.set(config.settings.rednetGatewayEnabled, enabled)
     local serverName = argOrPrompt(state, "server_name", "Turtle server name", settingsx.get(config.settings.serverName) or config.defaults.serverName)
     settingsx.set(config.settings.serverName, serverName or config.defaults.serverName)
-    local token = argOrPrompt(state, "auth_token", "Rednet auth token (blank disables token)", settingsx.get(config.settings.authToken) or "")
+    local token = argOrPrompt(state, "auth_token", "Rednet auth token (blank locks remote commands)", settingsx.get(config.settings.authToken) or "")
     settingsx.set(config.settings.authToken, token or "")
     writeChannelsDoc(enabled)
     return true
@@ -422,7 +411,8 @@ M.register({
       print("Model: " .. tostring(settingsx.model()))
       print("Workspace: " .. tostring(settingsx.workspace()))
       print("Default agent: " .. tostring(identity.defaultAgentId()))
-      print("Safety/profile: " .. tostring(settingsx.safety()) .. " / " .. tostring(settingsx.profile()))
+      print("Safety: " .. tostring(settingsx.safety()))
+      print("Remote control: " .. tostring(settingsx.remoteAuthStatus()))
       print("")
       print("Next: run Agent Workspace or Chat from /craftmind/boot.lua")
       menu.pause()

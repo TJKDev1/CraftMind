@@ -1,6 +1,6 @@
 return {
   name = "CraftMind",
-  version = "0.3.0",
+  version = "0.3.1",
   files = {
     "README.md",
     "config.lua",
@@ -36,6 +36,7 @@ return {
     "apps/chat.lua",
     "apps/agent.lua",
     "apps/agents.lua",
+    "apps/remote.lua",
     "turtle/server.lua",
     "client/remote.lua",
   },

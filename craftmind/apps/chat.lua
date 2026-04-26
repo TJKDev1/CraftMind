@@ -26,7 +26,7 @@ while true do
     print("provider=" .. tostring(settingsx.provider()))
     print("model=" .. tostring(settingsx.model()))
     print("safety=" .. tostring(settingsx.safety()))
-    print("profile=" .. tostring(settingsx.profile()))
+    print("remote=" .. tostring(settingsx.remoteAuthStatus()))
     print("workspace=" .. tostring(settingsx.workspace()))
     print("agent=" .. tostring(activeAgent))
   elseif input:sub(1, 7) == "/agent " then

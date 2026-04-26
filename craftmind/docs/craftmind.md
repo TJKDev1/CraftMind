@@ -8,7 +8,8 @@ The product name, package namespace, install path, settings, and XML tools stay 
 
 - Stay ComputerCraft-native: Lua, shell, fs, term, peripheral, rednet, turtles, and in-game constraints.
 - Keep file/list/read/write tools workspace-scoped.
-- Gate shell execution and raw Lua behind `safety=power` or `profile=admin`.
+- Gate shell execution and raw Lua behind `safety=power`.
+- Require `craftmind.auth_token` for remote turtle commands; blank token locks remote control except discovery.
 - Prefer small, inspectable steps over hidden automation.
 - Default to one agent. Multi-agent orchestration is optional.
 
@@ -50,6 +51,6 @@ Agent identity and hatching files live inside the workspace at:
 
 Session logs live at `.craftmind/sessions/*.jsonl`. Skills live at `skills/<skill>/SKILL.md` or `.craftmind/skills/<skill>/SKILL.md`; CraftMind injects a compact skill list and expects agents to read the full skill on demand.
 
-CraftMind also creates workspace-local docs at `.craftmind/docs/` so agents can keep ComputerCraft-specific project guidance close to the workspace.
+CraftMind creates workspace-local docs at `.craftmind/docs/` and mirrors bundled package docs into `.craftmind/docs/bundled/`. Prompt context includes a compact docs manifest by default, not whole docs. Agents should list/read relevant docs on demand with workspace tools.
 
-Because these files are inside the workspace, an agent can inspect or modify its own bootstrap/identity/docs/memory with normal workspace tools when the user asks it to refine itself.
+Because these files are inside the workspace, an agent can inspect or modify its own bootstrap/identity/docs/memory with normal workspace tools when the user asks it to refine itself. Prefer local docs outside `.craftmind/docs/bundled/` for durable custom guidance because bundled mirrors may be regenerated.

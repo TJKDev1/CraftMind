@@ -18,8 +18,8 @@ The project name stays **CraftMind**. OpenClaw describes the idea, scope, and ag
 - Optional multi-agent messaging/orchestration while keeping one default agent by default
 - Power mode for raw Lua/shell execution when explicitly enabled
 - Modular providers: Groq, Gemini, NVIDIA NIM, OpenAI-compatible APIs
-- Curated bundled docs first, optional full ComputerCraft docs later
-- Shared codebase with profiles instead of separate safe/unsafe versions
+- OpenClaw-style docs manifest with workspace-readable mirrored docs
+- Shared codebase with explicit safety and remote-auth gates
 
 ## AI scope for this codebase
 
@@ -42,9 +42,10 @@ Prioritize ComputerCraft-native agent workflows, turtle/rednet use cases, Lua co
 - `ai/session.lua` — ComputerCraft-friendly session JSONL persistence
 - `ai/workspace_agent.lua` — OpenClaw-style agent prompt loop
 - `ai/workspace_tools.lua` — workspace file/read/list/shell/Lua tools
-- `turtle/server.lua` — Rednet turtle server skeleton
-- `client/remote.lua` — discovery/run client library
-- `docs/index.lua` — curated local docs search plus markdown docs loader
+- `turtle/server.lua` — Rednet turtle server with discovery/status/inventory/inspect/refuel/gated Lua
+- `client/remote.lua` — discovery/status/inventory/inspect/refuel/run client library
+- `apps/remote.lua` — terminal UI for remote turtle servers
+- `docs/index.lua` — docs manifest plus optional RAG search over workspace docs
 - `docs/*.md` — CraftMind documentation visible to agents
 - `identity/init.lua` — hatching, identity context, memory/inbox helpers
 - `onboarding/init.lua` — modular QuickStart/Advanced/Repair/non-interactive setup steps
@@ -116,11 +117,17 @@ Use `Hatch / activate agent` to give the assistant an id, a name, and a Computer
   .craftmind/docs/
     craftmind.md
     self-modification.md
+    computercraft-quick-reference.md
+    bundled/
+      agents.md
+      craftmind.md
+      openclaw-adaptation.md
+      tools.md
   .craftmind/sessions/
     terminal-main.jsonl
 ```
 
-Chat and Agent Workspace include these files as prompt context. The files are workspace-scoped, so the agent can read or modify its own bootstrap, identity, memory, and local docs through normal tools when asked. Multi-agent messaging is available with `<craftmind-message to="agent-id">...</craftmind-message>`, but the default flow is still one agent.
+Chat and Agent Workspace include bootstrap/identity as prompt context and include a compact docs manifest. Docs live in the workspace, so the agent can list/read relevant docs on demand with normal workspace tools. The agent can also modify bootstrap, identity, memory, and local docs when asked. Use `<craftmind-replace>` for exact small edits and `<craftmind-file>` for whole-file writes. Multi-agent messaging is available with `<craftmind-message to="agent-id">...</craftmind-message>`, but the default flow is still one agent.
 
 ## Agent Workspace
 
@@ -130,13 +137,13 @@ Run from menu or directly:
 craftmind/apps/agent.lua
 ```
 
-Agent gets dedicated workspace (`/craftmind/workspace` by default). It can list/read/write workspace files and exchange agent messages in safe mode. Shell/Lua tool blocks are blocked unless safety is `power` or profile is `admin`.
+Agent gets dedicated workspace (`/craftmind/workspace` by default). It can list/read/write workspace files and exchange agent messages in safe mode. Shell/Lua tool blocks are blocked unless safety is `power`.
 
 ## Safety defaults
 
-Default mode is safe. Raw Lua and shell execution are blocked unless safety is `power` or profile is `admin`. Workspace file/list/read/message tools remain workspace-scoped. Preview + confirmation is enabled by default for chat raw-Lua flows.
+Default mode is safe. Raw Lua and shell execution are blocked unless safety is `power`. Workspace file/list/read/message tools remain workspace-scoped. Preview + confirmation is enabled by default for chat raw-Lua flows.
 
-For multiplayer servers, set `craftmind.auth_token` on turtle servers before remote execution.
+Remote turtle commands require a matching `craftmind.auth_token` on the server. A blank token locks remote control except discovery. The Remote Turtles app can discover servers, query status/inventory, inspect blocks, select/refuel slots, and request raw Lua; server-side safety gates still apply.
 
 ## Provider notes
 

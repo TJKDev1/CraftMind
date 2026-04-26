@@ -25,6 +25,27 @@ local function truncate(text, maxLen)
   return text:sub(1, maxLen) .. "\n...[truncated " .. tostring(#text - maxLen) .. " chars]"
 end
 
+local function stripBlock(text)
+  return (text or ""):gsub("^\n", ""):gsub("\n$", "")
+end
+
+local function escapePattern(text)
+  return (text:gsub("([^%w])", "%%%1"))
+end
+
+local function countPlain(haystack, needle)
+  if needle == "" then return 0 end
+  local count = 0
+  local pos = 1
+  while true do
+    local s, e = string.find(haystack, needle, pos, true)
+    if not s then break end
+    count = count + 1
+    pos = e + 1
+  end
+  return count
+end
+
 local function root()
   local r = settingsx.workspace and settingsx.workspace() or config.defaults.workspace
   r = trim(r or "/craftmind/workspace"):gsub("\\", "/")
@@ -146,7 +167,7 @@ function M.canRun()
 end
 
 function M.runShell(command)
-  if not M.canRun() then return false, "shell execution blocked by safety/profile settings" end
+  if not M.canRun() then return false, "shell execution blocked by safety setting" end
   command = trim(command)
   if command == "" then return false, "empty command" end
   local r = ensureWorkspace()
@@ -162,7 +183,7 @@ function M.runShell(command)
 end
 
 function M.runLua(code)
-  if not M.canRun() then return false, "raw Lua execution blocked by safety/profile settings" end
+  if not M.canRun() then return false, "raw Lua execution blocked by safety setting" end
   code = code or ""
   if trim(code) == "" then return false, "empty Lua" end
   local r = ensureWorkspace()
@@ -184,39 +205,85 @@ function M.extract(text)
   local ops = {}
   text = text or ""
 
-  for attrText, body in string.gmatch(text, "<craftmind%-file(.-)>(.-)</craftmind%-file>") do
+  local function add(pos, op)
+    op._pos = pos
+    table.insert(ops, op)
+  end
+
+  local function scanBlock(pattern, build)
+    local start = 1
+    while true do
+      local s, e, a, b = string.find(text, pattern, start)
+      if not s then break end
+      add(s, build(a, b))
+      start = e + 1
+    end
+  end
+
+  local function scanSelf(pattern, build)
+    local start = 1
+    while true do
+      local s, e, a = string.find(text, pattern, start)
+      if not s then break end
+      add(s, build(a))
+      start = e + 1
+    end
+  end
+
+  scanBlock("<craftmind%-file(.-)>(.-)</craftmind%-file>", function(attrText, body)
     local attrs = parseAttrs(attrText)
-    table.insert(ops, { type = "file", path = attrs.path, mode = attrs.mode or "write", content = body:gsub("^\n", ""):gsub("\n$", "") })
-  end
-  for attrText in string.gmatch(text, "<craftmind%-read(.-)/>") do
+    return { type = "file", path = attrs.path, mode = attrs.mode or "write", content = stripBlock(body) }
+  end)
+
+  scanBlock("<craftmind%-replace(.-)>(.-)</craftmind%-replace>", function(attrText, body)
     local attrs = parseAttrs(attrText)
-    table.insert(ops, { type = "read", path = attrs.path })
-  end
-  for attrText in string.gmatch(text, "<craftmind%-list(.-)/>") do
+    return {
+      type = "replace",
+      path = attrs.path,
+      count = attrs.count,
+      old = stripBlock(body:match("<old>(.-)</old>") or ""),
+      new = stripBlock(body:match("<new>(.-)</new>") or ""),
+    }
+  end)
+
+  scanSelf("<craftmind%-read(.-)/>", function(attrText)
     local attrs = parseAttrs(attrText)
-    table.insert(ops, { type = "list", path = attrs.path or "." })
-  end
-  for attrText in string.gmatch(text, "<craftmind%-exec(.-)/>") do
+    return { type = "read", path = attrs.path }
+  end)
+
+  scanSelf("<craftmind%-list(.-)/>", function(attrText)
     local attrs = parseAttrs(attrText)
-    table.insert(ops, { type = "exec", command = attrs.command })
-  end
-  for attrText, body in string.gmatch(text, "<craftmind%-exec(.-)>(.-)</craftmind%-exec>") do
+    return { type = "list", path = attrs.path or "." }
+  end)
+
+  scanSelf("<craftmind%-exec(.-)/>", function(attrText)
     local attrs = parseAttrs(attrText)
-    table.insert(ops, { type = "exec", command = attrs.command or body })
-  end
-  for body in string.gmatch(text, "<craftmind%-lua>(.-)</craftmind%-lua>") do
-    table.insert(ops, { type = "lua", code = body:gsub("^\n", ""):gsub("\n$", "") })
-  end
-  for attrText, body in string.gmatch(text, "<craftmind%-message(.-)>(.-)</craftmind%-message>") do
+    return { type = "exec", command = attrs.command }
+  end)
+
+  scanBlock("<craftmind%-exec(.-)>(.-)</craftmind%-exec>", function(attrText, body)
     local attrs = parseAttrs(attrText)
-    table.insert(ops, { type = "message", to = attrs.to or attrs.agent or attrs.id, from = attrs.from, content = body:gsub("^\n", ""):gsub("\n$", "") })
-  end
+    return { type = "exec", command = attrs.command or stripBlock(body) }
+  end)
+
+  scanBlock("<craftmind%-lua>()(.-)</craftmind%-lua>", function(_, body)
+    return { type = "lua", code = stripBlock(body) }
+  end)
+
+  scanBlock("<craftmind%-message(.-)>(.-)</craftmind%-message>", function(attrText, body)
+    local attrs = parseAttrs(attrText)
+    return { type = "message", to = attrs.to or attrs.agent or attrs.id, from = attrs.from, content = stripBlock(body) }
+  end)
+
+  table.sort(ops, function(a, b) return a._pos < b._pos end)
+  for _, op in ipairs(ops) do op._pos = nil end
   return ops
 end
 
 function M.stripToolBlocks(text)
   text = text or ""
   text = text:gsub("<craftmind%-file.->.-</craftmind%-file>", "")
+  text = text:gsub("<craftmind%-replace.->.-</craftmind%-replace>", "")
   text = text:gsub("<craftmind%-lua>.-</craftmind%-lua>", "")
   text = text:gsub("<craftmind%-exec.->.-</craftmind%-exec>", "")
   text = text:gsub("<craftmind%-message.->.-</craftmind%-message>", "")
@@ -233,6 +300,28 @@ function M.run(op)
     if op.mode ~= "write" and op.mode ~= "append" then return false, "unsupported file mode: " .. tostring(op.mode) end
     if op.mode == "append" then fileTool.append(path, op.content or "") else fileTool.write(path, op.content or "") end
     return true, op.mode .. " " .. path
+  elseif op.type == "replace" then
+    local path, err = workspacePath(op.path)
+    if not path then return false, err end
+    local old = tostring(op.old or "")
+    local new = tostring(op.new or "")
+    if old == "" then return false, "empty replacement old text" end
+    local content, readErr = fileTool.read(path)
+    if not content then return false, readErr end
+    local found = countPlain(content, old)
+    if found == 0 then return false, "old text not found in " .. path end
+    local expected = op.count
+    if expected == nil or expected == "" then expected = 1 end
+    if expected ~= "all" then
+      expected = tonumber(expected) or 1
+      if found ~= expected then return false, "expected " .. tostring(expected) .. " match(es), found " .. tostring(found) end
+    end
+    local pattern = escapePattern(old)
+    local repl = new:gsub("%%", "%%%%")
+    local updated, changed
+    if op.count == "all" then updated, changed = content:gsub(pattern, repl) else updated, changed = content:gsub(pattern, repl, expected) end
+    fileTool.write(path, updated)
+    return true, "replace " .. tostring(changed) .. " match(es) in " .. path
   elseif op.type == "read" then
     local path, err = workspacePath(op.path)
     if not path then return false, err end

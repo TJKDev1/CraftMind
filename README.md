@@ -13,7 +13,7 @@ Build a safe, useful OpenClaw-style agent experience for ComputerCraft:
 - Workspace-scoped file inspect/read/write tools
 - Shell/Lua execution loops with explicit safety gates
 - Docs-aware chat for ComputerCraft, turtles, rednet, and Lua
-- Multiplayer-safe defaults with admin/power mode opt-in
+- Multiplayer-safe defaults with explicit power mode opt-in
 - Modular provider support for Groq, Gemini, NVIDIA NIM, and OpenAI-compatible APIs
 
 Out of scope for now: non-ComputerCraft desktop automation, browser automation, and general-purpose OS agents outside the ComputerCraft environment.
@@ -29,7 +29,7 @@ Early rewrite skeleton. Core modules exist, but APIs and UX may change while the
   - Gemini
   - NVIDIA NIM
   - OpenAI-compatible endpoints
-- Safe-by-default multiplayer profile
+- Safe-by-default local and remote controls
 - OpenClaw-style Agent Workspace with autonomous ReAct tool loops
 - OpenClaw-style bootstrap context (`AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `HEARTBEAT.md`, `MEMORY.md`)
 - Hatchable ComputerCraft agent identity (`soul.md`, `identity.md`, `tools.md`, `memory.md`, `inbox.md`)
@@ -39,8 +39,8 @@ Early rewrite skeleton. Core modules exist, but APIs and UX may change while the
 - Dedicated workspace at `/craftmind/workspace` by default
 - Optional power mode for raw Lua and shell execution
 - Raw Lua preview and confirmation for chat raw-Lua flows
-- Curated local ComputerCraft docs context
-- Rednet turtle server skeleton
+- OpenClaw-style docs manifest with workspace-readable mirrored docs
+- Rednet turtle server and remote turtle client for discovery, status, inventory, inspect, refuel, and gated raw Lua
 - Public GitHub installer
 
 ## Install / Update
@@ -66,6 +66,7 @@ craftmind/apps/setup.lua
 craftmind/apps/chat.lua
 craftmind/apps/agent.lua
 craftmind/apps/agents.lua
+craftmind/apps/remote.lua
 ```
 
 ## Onboarding
@@ -75,7 +76,7 @@ CraftMind setup now follows the OpenClaw onboarding pattern, adapted to Computer
 1. Security warning and explicit acknowledgement.
 2. Model provider and credentials.
 3. Workspace selection and bootstrap file seeding.
-4. Safety/profile defaults.
+4. Execution safety defaults.
 5. User profile written to `USER.md`.
 6. Agent hatching into `.craftmind/agents/<id>/`.
 7. Optional advanced modules for docs mode, max steps, rednet/turtle gateway notes, and skill seeding.
@@ -119,11 +120,17 @@ CraftMind creates OpenClaw-style workspace files plus default agent files:
   .craftmind/docs/
     craftmind.md
     self-modification.md
+    computercraft-quick-reference.md
+    bundled/
+      agents.md
+      craftmind.md
+      openclaw-adaptation.md
+      tools.md
   .craftmind/sessions/
     terminal-main.jsonl
 ```
 
-These files are included in chat and agent prompts, so the assistant has durable OpenClaw-style context, a ComputerCraft-focused identity, local docs, and recent session memory. Because they live inside the workspace, the agent can inspect or update them with normal workspace tools when you ask it to refine itself.
+Bootstrap and identity files are included in chat and agent prompts. Docs are provided as a compact manifest by default, and the actual docs live inside the workspace so the agent can inspect them on demand with normal workspace tools. The agent can update local docs/memory/identity when you ask it to refine itself.
 
 Multi-agent mode is optional. Agents can message each other with `<craftmind-message to="agent-id">...</craftmind-message>`; the default experience remains one agent.
 
@@ -134,11 +141,11 @@ Default settings:
 ```txt
 provider: groq
 safety: safe
-profile: multiplayer
+remote control: locked until auth token is set
 raw lua confirm: always
 ```
 
-Agent file/read/list/message tools stay inside its workspace. Shell and raw Lua tools are blocked unless safety is `power` or profile is `admin`; when enabled, they run with full ComputerCraft permissions from the workspace. External content, rednet messages, docs, and tool output are treated as untrusted. In multiplayer, set an auth token on turtle servers before remote execution.
+Agent file/read/list/message tools stay inside its workspace. Shell and raw Lua tools are blocked unless safety is `power`; when enabled, they run with full ComputerCraft permissions from the workspace. External content, rednet messages, docs, and tool output are treated as untrusted. Remote turtle commands require a matching `craftmind.auth_token`; a blank token locks remote control except discovery.
 
 ## Project layout
 
@@ -148,7 +155,7 @@ craftmind/
   ai/         chat, workspace agent, and Lua execution logic
   client/     remote client helpers
   core/       settings, HTTP, logging
-  docs/       curated docs index and agent-visible markdown docs
+  docs/       docs manifest/RAG index and agent-visible markdown docs
   identity/   hatchable agent identity files and context loader
   providers/  AI provider adapters
   tools/      local tools such as file I/O

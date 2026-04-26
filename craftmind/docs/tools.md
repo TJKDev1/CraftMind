@@ -10,11 +10,19 @@ CraftMind agents request actions by emitting exact XML blocks. The app parses th
 <craftmind-file path="relative/file.lua" mode="write">
 -- full file contents
 </craftmind-file>
+<craftmind-replace path="relative/file.lua">
+<old>
+exact old text
+</old>
+<new>
+exact new text
+</new>
+</craftmind-replace>
 ```
 
-Paths are relative to the workspace. Parent paths (`..`) are rejected. Absolute-looking paths are treated as workspace-relative by stripping the leading slash.
+Paths are relative to the workspace. Parent paths (`..`) are rejected. Absolute-looking paths are treated as workspace-relative by stripping the leading slash. `craftmind-replace` requires one exact match by default; add `count="all"` only when a broad replacement is intended.
 
-## Power/admin tools
+## Power tools
 
 ```xml
 <craftmind-exec command="ls" />
@@ -23,7 +31,7 @@ print("hi")
 </craftmind-lua>
 ```
 
-Shell and raw Lua require `safety=power` or `profile=admin`. They run from the workspace directory but have full ComputerCraft permissions, so they must be small and auditable.
+Shell and raw Lua require `safety=power`. They run from the workspace directory but have full ComputerCraft permissions, so they must be small and auditable.
 
 ## Skills
 

@@ -41,6 +41,21 @@ local function readIfExists(path)
   return text
 end
 
+local function replaceAllIfExists(path, old, new)
+  local text = readIfExists(path)
+  if text == "" or old == "" then return end
+  local changed = false
+  local start = 1
+  while true do
+    local s, e = text:find(old, start, true)
+    if not s then break end
+    text = text:sub(1, s - 1) .. new .. text:sub(e + 1)
+    start = s + #new
+    changed = true
+  end
+  if changed then fileTool.write(path, text) end
+end
+
 local function truncate(text, maxLen)
   text = tostring(text or "")
   maxLen = maxLen or 5000
@@ -66,6 +81,31 @@ function M.docsDir()
   return dir
 end
 
+local function writeGenerated(path, content)
+  ensureParent(path)
+  fileTool.write(path, content or "")
+end
+
+local function mirrorBundledDocs(dir)
+  local srcDir = "/craftmind/docs"
+  if not fs.exists(srcDir) or not fs.isDir(srcDir) then return end
+  local dstDir = fs.combine(dir, "bundled")
+  ensureDir(dstDir)
+  for _, name in ipairs(fs.list(srcDir)) do
+    if name:sub(-3) == ".md" then
+      local src = fs.combine(srcDir, name)
+      if not fs.isDir(src) then
+        local text = readIfExists(src)
+        if text ~= "" then
+          writeGenerated(fs.combine(dstDir, name), [[<!-- Generated mirror of /craftmind/docs/]] .. name .. [[. Edit workspace docs outside bundled/ for durable local changes. -->
+
+]] .. text)
+        end
+      end
+    end
+  end
+end
+
 function M.ensureDocs()
   local dir = M.docsDir()
   writeIfMissing(fs.combine(dir, "craftmind.md"), [[# Workspace CraftMind docs
@@ -76,10 +116,12 @@ CraftMind is an OpenClaw-style ComputerCraft agent system. It should stay focuse
 
 Default safety model:
 - Workspace file/list/read/message tools are allowed inside the workspace.
-- Shell and raw Lua require `safety=power` or `profile=admin`.
+- Shell and raw Lua require `safety=power`.
+- Remote turtle commands require matching `craftmind.auth_token`; blank token locks remote control except discovery.
 - OpenClaw-style bootstrap files live at workspace root: `AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `HEARTBEAT.md`, and `MEMORY.md`.
 - Identity files live under `.craftmind/agents/<id>/`.
 - Session logs live under `.craftmind/sessions/` as JSONL.
+- Bundled package docs are mirrored to `.craftmind/docs/bundled/` so workspace-scoped tools can read them on demand.
 ]])
   writeIfMissing(fs.combine(dir, "self-modification.md"), [[# Self modification
 
@@ -92,8 +134,39 @@ Good self-modification targets:
 - `.craftmind/agents/<id>/tools.md`
 - `.craftmind/docs/*.md`
 
-Do not bypass workspace restrictions. Do not weaken shell/raw Lua safety gates.
+Do not bypass workspace restrictions. Do not weaken shell/raw Lua safety gates. Prefer local docs outside `.craftmind/docs/bundled/`; bundled docs are regenerated from `/craftmind/docs`.
 ]])
+  writeIfMissing(fs.combine(dir, "computercraft-quick-reference.md"), [[# ComputerCraft quick reference
+
+ComputerCraft runs Lua programs on computers, turtles, pocket computers, and command computers. Common APIs include `shell`, `fs`, `term`, `rednet`, `peripheral`, `settings`, `textutils`, and `http`.
+
+## Turtles
+
+Useful turtle calls: `turtle.forward`, `back`, `up`, `down`, `turnLeft`, `turnRight`, `dig`, `digUp`, `digDown`, `place`, `placeUp`, `placeDown`, `select`, `getItemCount`, `refuel`, `getFuelLevel`, `inspect`, `compare`, `suck`, and `drop`.
+
+Ask before turtle movement or digging that could risk blocks, items, fuel, or position.
+
+## Rednet
+
+Rednet needs a modem opened with `rednet.open(side)`. Send with `rednet.send(id, message, protocol)`, receive with `rednet.receive(protocol, timeout)`, and broadcast with `rednet.broadcast(message, protocol)`. CraftMind remote turtle commands require matching `craftmind.auth_token`; a blank token locks remote control except discovery.
+
+## HTTP
+
+HTTP must be enabled in server config. Use `http.get`, `http.post`, `response.readAll()`, and `response.close()`. Encode/decode JSON with `textutils.serializeJSON` and `textutils.unserializeJSON`.
+
+## Filesystem
+
+Use `fs.exists`, `fs.open`, `fs.makeDir`, `fs.delete`, `fs.list`, and `fs.getDir`. File handle methods include `readAll`, `write`, `writeLine`, and `close`.
+]])
+  mirrorBundledDocs(dir)
+  replaceAllIfExists(fs.combine(dir, "craftmind.md"), "`safety=power` or `profile=admin`", "`safety=power`")
+  replaceAllIfExists(fs.combine(dir, "craftmind.md"), "power/admin", "power mode")
+  if not readIfExists(fs.combine(dir, "craftmind.md")):find("blank token locks remote control", 1, true) then
+    replaceAllIfExists(fs.combine(dir, "craftmind.md"), "- Shell and raw Lua require `safety=power`.", "- Shell and raw Lua require `safety=power`.\n- Remote turtle commands require matching `craftmind.auth_token`; blank token locks remote control except discovery.")
+  end
+  if not readIfExists(fs.combine(dir, "craftmind.md")):find("bundled/", 1, true) then
+    replaceAllIfExists(fs.combine(dir, "craftmind.md"), "- Session logs live under `.craftmind/sessions/` as JSONL.", "- Session logs live under `.craftmind/sessions/` as JSONL.\n- Bundled package docs are mirrored to `.craftmind/docs/bundled/` so workspace-scoped tools can read them on demand.")
+  end
   return dir
 end
 
@@ -142,8 +215,9 @@ I can ask CraftMind to use inspectable XML tool blocks:
 - `<craftmind-read path="file.lua" />` reads workspace files.
 - `<craftmind-file path="file.lua" mode="write">...</craftmind-file>` writes workspace files.
 - `<craftmind-file path="file.lua" mode="append">...</craftmind-file>` appends workspace files.
-- `<craftmind-exec command="ls" />` runs shell commands only in power/admin mode.
-- `<craftmind-lua>...</craftmind-lua>` runs Lua only in power/admin mode.
+- `<craftmind-replace path="file.lua"><old>exact old text</old><new>exact new text</new></craftmind-replace>` replaces one exact match in a workspace file.
+- `<craftmind-exec command="ls" />` runs shell commands only in power mode.
+- `<craftmind-lua>...</craftmind-lua>` runs Lua only in power mode.
 - `<craftmind-message to="agent-id">message</craftmind-message>` sends a message to another CraftMind agent.
 
 File/list/read paths are workspace-scoped. Shell and Lua are more powerful and must stay small, auditable, and ComputerCraft-focused.
@@ -157,8 +231,12 @@ This agent can work alone by default. In a multi-agent workspace, messages are d
 Conventions:
 - Keep messages short and task-focused.
 - State which files or ComputerCraft systems you touched.
-- Do not delegate unsafe shell/Lua work unless the user enabled power/admin mode.
+- Do not delegate unsafe shell/Lua work unless the user enabled power mode.
 ]])
+
+  replaceAllIfExists(fs.combine(dir, "tools.md"), "power/admin mode", "power mode")
+  replaceAllIfExists(fs.combine(dir, "tools.md"), "`safety=power` or `profile=admin`", "`safety=power`")
+  replaceAllIfExists(fs.combine(dir, "orchestration.md"), "power/admin mode", "power mode")
 
   return id, dir
 end

@@ -1,15 +1,15 @@
 local config = {
   name = "CraftMind",
-  version = "0.3.0",
+  version = "0.3.1",
   namespace = "craftmind",
   mission = "Build the OpenClaw idea for ComputerCraft: an AI-first ComputerCraft workspace agent.",
 
   defaults = {
     provider = "groq",
-    safety = "safe", -- safe | power
+    safety = "safe", -- safe | power; only power unlocks shell/raw Lua
     rawLuaConfirm = "always", -- always | optional | off
-    profile = "multiplayer", -- multiplayer | singleplayer | admin
-    docsMode = "curated", -- curated | full | off
+    profile = "multiplayer", -- legacy; no longer controls permissions
+    docsMode = "manifest", -- manifest | rag | off (legacy curated/full are treated as manifest)
     workspace = "/craftmind/workspace",
     agentMaxSteps = 8,
     defaultAgent = "main",
